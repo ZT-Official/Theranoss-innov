@@ -1,0 +1,1335 @@
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="author" content="Zurab Tushuri">
+<meta name="description" content="Theranos: the rise, the fall and the failures behind it. How a company attracted funding and trust before its technology had adequate validation.">
+<title>Theranos: Rise and Fall</title>
+<script>document.documentElement.className = 'js';</script>
+<style>
+/* ------------------------------------------------------------------
+   Tokens
+------------------------------------------------------------------- */
+/* Flipped to a light scheme. The page used to render dark whenever the OS
+   asked for dark, so the body colour below is literally the old dark
+   background (#13110f) and the paper is white. Every other neutral was
+   re-derived to hold the SAME CONTRAST RATIO against the new paper that it
+   held against the old dark paper, rather than being lightness-mirrored:
+       ink    19.3:1    ink-2  12.0:1    ink-3  7.0:1    stage  5.3:1
+   --red keeps its hue and measures 7.97:1 on white, so it needed no
+   darkening. Nothing below this block changes colour by rule. */
+:root{
+  color-scheme:light;
+  --paper:#ffffff;
+  --paper-cool:#edf0f3;
+  --ink:#13110f;
+  --ink-2:#3a3632;
+  --ink-3:#5f5952;
+  --rule:rgba(19,17,15,.13);
+  --rule-2:rgba(19,17,15,.40);
+  --red:#a1121b;
+  --red-pale:#dda3a3;
+  --on-red:#ffffff;
+  --stage:#726c64;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua","URW Palladio L",Georgia,"Times New Roman",serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  --fs:clamp(17px, .45vw + 12.5px, 25px);
+  --gutter:clamp(250px, 28vw, 760px);
+  --gap:clamp(24px, 3.5vw, 96px);
+  --rail-w:clamp(76px, 6.5vw, 120px);
+  --col:65ch;
+  /* newspaper rhythm: sections are separated by a hairline rule, not by a
+     screenful of air, so the vertical pad is a few steps down the scale */
+  --pad-y:clamp(2rem, 4.6vh, 3.4rem);
+  --line:1.55em;          /* the body line-height, reused as the gutter unit */
+}
+/* The narrative turns: cooler, tighter. Same ratios as --ink-2 / --ink-3,
+   shifted to the cool side of neutral. */
+.fall{
+  --ink-2:#34383d;
+  --ink-3:#565c62;
+  --col:58ch;
+  --pad-y:clamp(1.7rem, 3.8vh, 2.9rem);
+}
+/* No dark-mode block. This is a projected presentation artifact: it has to
+   look identical on whatever laptop it is opened on, and the pixel art is
+   exposed specifically for a white page. Honouring prefers-color-scheme here
+   would have meant shipping a second set of images that are tonally the
+   opposite of the ones that were tuned and tested. */
+
+/* ------------------------------------------------------------------
+   Base
+------------------------------------------------------------------- */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:var(--fs);
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+::selection{background:var(--red);color:var(--on-red)}
+p{margin:0 0 1em}
+strong{font-weight:650}
+.vh{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* ------------------------------------------------------------------
+   Fixed layers: tone, stage (the drop), rail
+------------------------------------------------------------------- */
+.tone{position:fixed;inset:0;background:var(--paper-cool);opacity:0;z-index:0;pointer-events:none}
+.gutter-box{position:fixed;left:0;top:0;width:var(--gutter);height:100vh;visibility:hidden;pointer-events:none}
+.stage{position:fixed;left:0;top:0;width:100%;height:100%;z-index:1;pointer-events:none;overflow:visible;will-change:transform}
+.no-js .stage,.no-js .cue{display:none}
+
+.stage .st{fill:none;stroke:var(--stage);stroke-width:1.25;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-linejoin:round}
+.stage .faint{stroke-opacity:.5}
+.stage .dash{stroke-dasharray:3 4}
+.stage .skin{fill:none}
+.stage .body{fill:var(--ink);fill-opacity:.03}
+.stage .blood{fill:var(--red)}
+.stage .pale{fill:var(--red-pale)}
+.stage .gloss{fill:var(--on-red);opacity:.36}
+.stage .dl{fill:var(--red-pale);stroke:var(--red);stroke-width:1;stroke-opacity:.75;vector-effect:non-scaling-stroke}
+.stage .diluent{fill:var(--paper);stroke:var(--stage);stroke-width:1.1;vector-effect:non-scaling-stroke}
+.stage .conduit{fill:none;stroke:var(--ink);stroke-opacity:.07;stroke-linejoin:round;stroke-linecap:round}
+.stage .hl{fill:var(--red);fill-opacity:.07;stroke:var(--red);stroke-width:1.5;vector-effect:non-scaling-stroke}
+.stage .scan{stroke:var(--red);stroke-width:1.5;vector-effect:non-scaling-stroke}
+.stage .ripple{fill:none;stroke:var(--red);stroke-width:1;vector-effect:non-scaling-stroke}
+.stage .tick{fill:none;stroke:var(--on-red);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.stage .unc{fill:none;stroke:var(--red);stroke-width:1.5;stroke-dasharray:3 2.5;vector-effect:non-scaling-stroke}
+.stage .q{fill:var(--red);font-family:var(--sans);font-weight:700}
+.stage .lbl{fill:var(--ink-3);font-family:var(--sans);font-weight:600;letter-spacing:.14em;text-transform:uppercase}
+.stage .dot{fill:var(--stage)}
+.stage .tr{stroke:var(--stage);stroke-width:1.25;vector-effect:non-scaling-stroke;stroke-linecap:round}
+
+/* Progress rail (desktop: vertical, right edge) */
+.rail{position:fixed;z-index:3;top:10vh;bottom:10vh;right:0;width:var(--rail-w);pointer-events:none}
+.rail-bg{display:none}
+.rail-inner{position:absolute;top:0;bottom:0;right:calc(var(--rail-w) * .3);width:1px;background:var(--rule-2)}
+.rail-fill{position:absolute;left:0;top:0;width:1px;height:100%;background:var(--red);transform-origin:0 0;transform:scaleY(0)}
+.rail-dot{position:absolute;left:-4px;top:-4px;width:9px;height:9px;border-radius:50%;background:var(--red)}
+.no-js .rail-fill,.no-js .rail-dot{display:none}
+.rail ol{list-style:none;margin:0;padding:0;position:absolute;inset:0}
+.rail li{position:absolute;left:0;top:calc(var(--p) * 100%);width:0;height:0}
+.rail li::before{content:"";position:absolute;left:-4px;top:0;width:9px;height:1px;background:var(--rule-2)}
+.rail a{
+  pointer-events:auto;position:absolute;right:12px;top:0;transform:translateY(-50%);
+  font:600 clamp(11px, .55vw + 4px, 15px)/1 var(--sans);letter-spacing:.04em;
+  color:var(--ink-3);text-decoration:none;padding:3px 4px;white-space:nowrap;
+  font-variant-numeric:tabular-nums;transition:color .3s ease;
+}
+.rail a:hover{color:var(--ink)}
+.rail a.is-active{color:var(--red)}
+.rail a:focus-visible{outline:2px solid var(--red);outline-offset:2px;border-radius:2px}
+
+/* ------------------------------------------------------------------
+   Chapters
+------------------------------------------------------------------- */
+main,.sources{position:relative;z-index:2}
+.chapter{
+  position:relative;
+  /* kept tall enough that the drop still has scroll distance to travel, but
+     no longer a full screen of padding around a centred card */
+  min-height:72vh;min-height:72svh;
+  padding:var(--pad-y) var(--rail-w) var(--pad-y) calc(var(--gutter) + var(--gap));
+  display:flex;flex-direction:column;justify-content:center;
+}
+.chapter.long{min-height:96vh}
+.wrap{max-width:var(--col);width:100%}
+/* a rule between sections instead of a gap */
+.chapter + .chapter::before,
+.chapter + .sources::before{
+  content:"";position:absolute;top:0;
+  left:calc(var(--gutter) + var(--gap));right:var(--rail-w);
+  height:1px;background:var(--rule);
+}
+
+h1,h2,h3{font-family:var(--serif);font-weight:400;color:var(--ink);margin:0}
+h2{font-size:clamp(2rem, 1.1rem + 2.7vw, 4rem);line-height:1.04;letter-spacing:-.012em;margin:.35em 0 .55em;text-wrap:balance}
+.fall h2{letter-spacing:-.03em;line-height:1}
+h3{font-size:1.15em;line-height:1.2;margin:0 0 .25em}
+.eyebrow{font:600 .72em/1.3 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);margin:0}
+.eyebrow .num{color:var(--red);margin-right:.9em;font-variant-numeric:tabular-nums}
+.pull{font-family:var(--serif);font-size:1.3em;line-height:1.3;color:var(--ink);border-left:2px solid var(--ink);padding:.1em 0 .1em .9em;margin:1.4em 0 0;text-wrap:pretty}
+.fall .pull{border-left-color:var(--ink-3)}
+.pull .ev{font-size:.46em}
+.muted{color:var(--ink-2)}
+.note{display:block;color:var(--ink-3);font-size:.85em;margin-top:.35em}
+
+/* Evidence captions */
+.ev{
+  display:inline-block;font:600 .6em/1 var(--sans);letter-spacing:.09em;text-transform:uppercase;
+  color:var(--ink-3);border:1px solid var(--rule-2);border-radius:2px;
+  padding:.45em .55em .4em;margin:0 0 0 .35em;vertical-align:.18em;white-space:nowrap;
+}
+.ev-alleg{border-style:dashed}
+.ev-claim{border-style:dotted}
+.ev-court{border-color:var(--ink-3);color:var(--ink-2)}
+
+/* Hero */
+.hero{--pad-y:9vh}
+.hero h1{margin:.45em 0 .55em}
+/* the masthead word itself carries the red; the subtitle and every section
+   heading stay in --ink. 7.97:1 on white. */
+.hero .t1{display:block;font-size:clamp(3.4rem, 1.6rem + 7vw, 10rem);line-height:.92;letter-spacing:-.035em;color:var(--red)}
+.hero .t2{display:block;font-style:italic;font-size:clamp(1.45rem, .9rem + 1.9vw, 3.1rem);line-height:1.12;letter-spacing:-.01em;margin-top:.35em;color:var(--ink-2);text-wrap:balance}
+.lede{font-size:1.18em;line-height:1.45;max-width:32em}
+.byline{font:600 .78em/1.3 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2);margin:1.4em 0 2em}
+.byline::before{content:"";display:inline-block;width:2.2em;height:1px;background:var(--red);vertical-align:.32em;margin-right:.8em}
+.key{border-top:1px solid var(--rule);padding-top:.9em;font-size:.8em;color:var(--ink-2);max-width:40em}
+.key-title{font:600 .82em/1.3 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);margin:0 0 .6em}
+.key-list{display:flex;flex-wrap:wrap;gap:.5em .45em;margin:0 0 .7em}
+.key-list .ev{margin:0;font-size:.74em;vertical-align:0}
+.key-note{margin:0}
+.cue{margin:2.2em 0 0;font:600 .68em/1.3 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
+
+/* Timelines */
+.tl{list-style:none;margin:0 0 1.1em;padding:0;border-top:1px solid var(--rule)}
+.tl li{display:grid;grid-template-columns:6.4em 1fr;gap:1em;padding:.7em 0;border-bottom:1px solid var(--rule)}
+.tl .when{font:600 .74em/2 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.tl p{margin:0}
+
+/* Big figures */
+.big{font:400 clamp(2.8rem, 1.8rem + 3.4vw, 5.6rem)/.92 var(--serif);color:var(--red);margin:0;letter-spacing:-.025em;font-variant-numeric:lining-nums;white-space:nowrap}
+.big .of{font-size:.42em;letter-spacing:0;color:var(--ink-2);margin-left:.15em}
+.stat{margin:1.5em 0 0;display:grid;grid-template-columns:auto 1fr;gap:.6em 1.3em;align-items:start}
+.stat figcaption{padding-top:.35em}
+
+/* Funding: three measures */
+.fund{width:100%;border-collapse:collapse;margin:.2em 0 1.3em;font-variant-numeric:tabular-nums lining-nums}
+.fund th,.fund td{text-align:left;padding:.62em .9em .62em 0;border-bottom:1px solid var(--rule);vertical-align:baseline}
+.fund thead th{font:600 .64em/1.3 var(--sans);letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);border-bottom-color:var(--rule-2)}
+.fund tbody th{font:600 .78em/1.4 var(--sans);letter-spacing:.04em;color:var(--ink-3);white-space:nowrap}
+.fund .fv{font-family:var(--serif);font-size:1.22em;color:var(--ink)}
+.fund .vv{font-family:var(--serif);font-size:1.22em;font-style:italic;color:var(--ink-2)}
+.fund .sub{display:block;font:400 .62em/1.4 var(--sans);font-style:normal;color:var(--ink-3)}
+.m{display:inline-flex;align-items:center;gap:.55em}
+.m::before{content:"";flex:none;width:.7em;height:.7em;border:1.5px solid currentColor}
+.m-fund::before{background:currentColor}
+.m-val::before{background:transparent;transform:rotate(45deg) scale(.82)}
+.m-rev::before{border-radius:50%;background:currentColor}
+.m-proj::before{border-radius:50%;border-style:dashed}
+.measures{border:1px solid var(--rule-2);padding:1em 1.2em 1.1em;margin:0}
+.measures-title{font:600 .7em/1.3 var(--sans);letter-spacing:.15em;text-transform:uppercase;color:var(--red);margin:0 0 .75em}
+.measures dl{margin:0 0 .8em;display:grid;gap:.55em}
+.measures dt{font-weight:650;color:var(--ink)}
+.measures dd{margin:.1em 0 0 1.25em;color:var(--ink-2);font-size:.92em}
+.measures p{margin:0;font-size:.92em}
+
+/* Persuasion steps */
+.steps{list-style:none;counter-reset:s;padding:0;margin:0 0 .4em}
+.steps li{counter-increment:s;display:grid;grid-template-columns:2.4em 1fr;gap:.7em;padding:.9em 0;border-top:1px solid var(--rule)}
+.steps li::before{content:counter(s, decimal-leading-zero);font:400 1.5em/1.05 var(--serif);color:var(--ink-3)}
+.steps p{margin:0;color:var(--ink-2)}
+
+/* Board */
+.board-title{font:600 .7em/1.3 var(--sans);letter-spacing:.15em;text-transform:uppercase;color:var(--ink-3);margin:0 0 .4em}
+.board{list-style:none;padding:0;margin:0 0 1.3em;border-top:1px solid var(--rule)}
+.board li{display:grid;grid-template-columns:minmax(8.5em, 30%) 1fr;gap:1em;padding:.65em 0;border-bottom:1px solid var(--rule);align-items:baseline}
+.board strong{font-family:var(--serif);font-weight:400;font-size:1.18em}
+.board span{color:var(--ink-2)}
+
+/* Walgreens flow */
+.flow{list-style:none;padding:0;margin:.3em 0 1.3em;display:grid;grid-template-columns:repeat(4, 1fr);counter-reset:f}
+.flow li{position:relative;counter-increment:f;padding:.8em 1.6em .8em 0;border-top:2px solid var(--ink);font-size:.9em;line-height:1.35}
+.flow li::before{content:counter(f, decimal-leading-zero);display:block;font:600 .74em/1.3 var(--sans);letter-spacing:.1em;color:var(--ink-3);margin-bottom:.45em}
+.flow li:not(:last-child)::after{content:"\2192";position:absolute;right:.45em;top:.55em;color:var(--ink-3)}
+
+/* Technology */
+.figs{display:grid;grid-template-columns:1fr 1fr;gap:1.4em 2em;margin:.3em 0 1.3em}
+.fig{margin:0;border-top:1px solid var(--rule-2);padding-top:.9em}
+.fig .big{font-size:clamp(2.4rem, 1.5rem + 2.7vw, 4.6rem)}
+.fig figcaption{margin-top:.55em;font-size:.92em}
+.g200{display:grid;grid-template-columns:repeat(25, 1fr);gap:2px;margin:.9em 0 0;max-width:17em}
+.g200 i{display:block;aspect-ratio:1/1;border:1px solid var(--rule-2)}
+.g200 i.on{background:var(--red);border-color:var(--red)}
+.g200-cap{font-size:.72em;color:var(--ink-3);margin:.45em 0 0}
+.rev{margin:1.3em 0 0;border-top:1px solid var(--rule-2);padding-top:.9em}
+.rev-cap{font:600 .7em/1.5 var(--sans);letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3);margin:0 0 .5em}
+.rev-cap .ev{letter-spacing:.09em}
+.rev-row{display:grid;grid-template-columns:minmax(9em, 34%) 1fr;gap:.2em 1em;align-items:center;margin:.7em 0}
+.rev-label{font-size:.84em;color:var(--ink-2);line-height:1.3}
+.bar{position:relative;height:.85em}
+.bar i{position:absolute;left:0;top:0;bottom:0;width:100%;background:var(--ink-3);transform-origin:0 50%}
+.bar i.hair{width:1px;background:var(--red)}
+.rev-val{grid-column:2;font-family:var(--serif);font-size:1.2em;line-height:1.1}
+.rev-val.red{color:var(--red)}
+.rev .small{font-size:.74em;color:var(--ink-3);margin:.6em 0 0}
+
+/* Lessons */
+.lessons .wrap{max-width:min(100%, 76rem)}
+.cols{display:grid;grid-template-columns:repeat(auto-fit, minmax(12em, 1fr));gap:1.4em 2.2em;margin:.4em 0 2.6em}
+.cols > div{border-top:2px solid var(--ink);padding-top:.85em}
+.cols p{color:var(--ink-2);font-size:.94em;margin:0}
+.closing{font:400 clamp(2.3rem, 1rem + 4.8vw, 6.4rem)/1 var(--serif);letter-spacing:-.03em;color:var(--red);margin:0 0 .45em;text-wrap:balance}
+.closing-sub{font-size:1.12em;color:var(--ink-2);max-width:38ch;margin:0}
+.final-drop{margin:1.3em 0 0;height:30px}
+.final-drop svg{display:block;fill:var(--red);overflow:visible}
+
+/* Sources */
+.chapter.sources{min-height:0;padding-top:12vh;padding-bottom:16vh;font-size:.82em}
+.sources h2{font-size:1.7em;letter-spacing:0;margin:.3em 0 .7em}
+.sources ol{padding-left:1.3em;margin:0 0 1.4em;color:var(--ink-2)}
+.sources li{margin:.55em 0;line-height:1.45;padding-left:.2em}
+.sources cite{font-style:italic}
+.sources .fine{color:var(--ink-3);font-size:.9em}
+
+/* ------------------------------------------------------------------
+   Pixel photography, set like a newspaper
+   Three width classes and nothing else. Thumbnails and half-column
+   pictures float with text beside them and alternate sides down the
+   page; the one full-column picture is centred. Every displayed width
+   is the PNG's own pixel width, so the blocks land on whole CSS pixels.
+------------------------------------------------------------------- */
+.wrap::after{content:"";display:table;clear:both}
+
+.figp{margin:0;padding:0}
+.figp img{
+  display:block;width:100%;height:auto;
+  image-rendering:crisp-edges;      /* older Firefox fallback, declared first */
+  image-rendering:pixelated;        /* wins wherever it is understood */
+  background:none;
+  /* On white paper an image whose own field is white has no edge. A hairline
+     in the ink-derived rule colour gives it one. box-shadow rather than a
+     border so the box keeps its exact pixel width and the blocks stay on
+     whole CSS pixels. Not a grey box: one device pixel. */
+  box-shadow:0 0 0 1px var(--rule-2);
+}
+.figp figcaption{
+  margin-top:.45em;padding-top:.4em;
+  border-top:1px solid var(--rule-2);
+  font:400 .72em/1.35 var(--sans);
+  color:var(--ink-2);
+}
+.figp .cap-what{display:block;color:var(--ink);font-weight:600}
+.figp .cap-src{display:block;margin-top:.1em;color:var(--ink-3)}
+
+/* width classes — the numbers are the export widths, nothing else */
+.pic-thumb{width:216px}
+.pic-half{width:324px}
+.pic-full{width:486px}
+
+/* floats: one line-height of air on the text side, flush on the outer side,
+   and never more than ~1 line below */
+.figp-left,.figp-right{margin-bottom:calc(var(--line) * 0.9)}
+.figp-left{float:left;margin:.28em var(--line) calc(var(--line) * 0.9) 0}
+.figp-right{float:right;margin:.28em 0 calc(var(--line) * 0.9) var(--line)}
+.figp-full{float:none;margin:calc(var(--line) * 0.75) auto;clear:both}
+
+/* a heading or a rule should never ride up beside a float */
+.figp-left + h2,.figp-right + h2,.figp-full + h2{clear:both}
+/* multi-column blocks drop below a float rather than being squeezed into a
+   channel too narrow to set them in */
+.measures,.rev,.g200,.figs,.fund,.flow,.board,.tl{clear:both}
+
+/* newspaper vocabulary: a small-caps lead-in opening each section's prose */
+.lead{
+  font:600 .84em/1 var(--sans);letter-spacing:.11em;text-transform:uppercase;
+  color:var(--ink);margin-right:.15em;
+}
+
+/* headings sit tight to the paragraph that follows them */
+.chapter h2{margin-bottom:.3em}
+.chapter .eyebrow + h2{margin-top:.25em}
+.pull{margin-top:var(--line)}
+.tl{margin-top:.3em}
+
+/* stepped reveal — pixel art should not cross-fade smoothly.
+   Overrides the generic .wrap > * transition by being more specific. */
+.reveal-on .chapter .wrap > .figp{
+  opacity:0;transform:translate3d(0,10px,0);
+  transition:opacity .62s steps(5,end),transform .62s steps(5,end);
+}
+.reveal-on .chapter.is-in .wrap > .figp{opacity:1;transform:none}
+@media (prefers-reduced-motion: reduce){
+  .reveal-on .chapter .wrap > .figp{opacity:1;transform:none;transition:none}
+}
+
+/* Image credits in the sources footer */
+.credits{list-style:none;padding:0;margin:0 0 1.2em;color:var(--ink-2)}
+.credits li{margin:.45em 0;line-height:1.45;padding-left:1.5em;text-indent:-1.5em}
+.credits .slide{font:600 .82em/1 var(--sans);letter-spacing:.06em;color:var(--ink-3);margin-right:.5em;font-variant-numeric:tabular-nums}
+
+/* Reveal (only when JS has set it up) */
+.reveal-on .chapter .wrap > *{opacity:0;transform:translate3d(0,16px,0);transition:opacity .9s cubic-bezier(.2,.7,.2,1),transform .9s cubic-bezier(.2,.7,.2,1)}
+.reveal-on .chapter.is-in .wrap > *{opacity:1;transform:none}
+.reveal-on .chapter.is-in .wrap > :nth-child(2){transition-delay:.07s}
+.reveal-on .chapter.is-in .wrap > :nth-child(3){transition-delay:.14s}
+.reveal-on .chapter.is-in .wrap > :nth-child(4){transition-delay:.21s}
+.reveal-on .chapter.is-in .wrap > :nth-child(5){transition-delay:.28s}
+.reveal-on .chapter.is-in .wrap > :nth-child(n+6){transition-delay:.35s}
+.reveal-on .rev .bar i:not(.hair){transform:scaleX(0);transition:transform 1.4s cubic-bezier(.2,.7,.2,1) .5s}
+.reveal-on .is-in .rev .bar i:not(.hair){transform:scaleX(1)}
+.js .final-drop{opacity:0}
+
+@media (prefers-reduced-motion: reduce){
+  .reveal-on .chapter .wrap > *,
+  .reveal-on .rev .bar i:not(.hair){opacity:1;transform:none;transition:none}
+  .rail a{transition:none}
+}
+
+/* ------------------------------------------------------------------
+   Narrow screens: drop in a thin fixed strip, rail across the top
+------------------------------------------------------------------- */
+@media (max-width: 899.98px){
+  :root{--gutter:0px;--gap:0px;--strip:46px;--rail-h:30px;--fs:17px;--rail-w:18px}
+  .chapter{padding:calc(var(--rail-h) + var(--pad-y)) 18px var(--pad-y) calc(var(--strip) + 12px)}
+  .chapter.long{min-height:84vh}
+  .chapter + .chapter::before,.chapter + .sources::before{
+    top:var(--rail-h);left:calc(var(--strip) + 12px);right:18px;
+  }
+  /* floats collapse to the column, but the tight spacing stays */
+  .figp-left,.figp-right,.figp-full{float:none;margin-left:auto;margin-right:auto}
+  .figp-left,.figp-right,.figp-full{
+    margin-top:calc(var(--line) * 0.55);
+    margin-bottom:calc(var(--line) * 0.9);
+  }
+  .pic-thumb{width:270px}            /* 54 blocks x 5 */
+  .pic-half,.pic-full{width:243px}   /* 81 blocks x 3 */
+  .gutter-box{top:var(--rail-h);bottom:0;width:var(--strip);height:auto}
+  .figs,.stat{grid-template-columns:1fr}
+  .board li{grid-template-columns:1fr;gap:.05em}
+  .flow{grid-template-columns:1fr 1fr}
+  .flow li:nth-child(2)::after{content:none}
+  .rev-row{grid-template-columns:1fr}
+  .rev-val{grid-column:1}
+  .tl li{grid-template-columns:4.9em 1fr;gap:.7em}
+  .fund th,.fund td{padding-right:.6em}
+
+  .rail{top:0;left:0;right:0;bottom:auto;width:auto;height:var(--rail-h)}
+  .rail-bg{display:block;position:absolute;inset:0}
+  .rail-bg i{position:absolute;inset:0;background:var(--paper)}
+  .rail-bg i.cool{background:var(--paper-cool);opacity:0}
+  .rail-inner{top:auto;bottom:8px;left:26px;right:26px;width:auto;height:1px}
+  .rail-fill{width:100%;height:1px;transform:scaleX(0)}
+  .rail li{left:calc(var(--p) * 100%);top:0}
+  .rail li::before{left:0;top:-3px;width:1px;height:7px}
+  .rail a{right:auto;left:0;top:-12px;transform:translate(-50%,-50%);font-size:10px;opacity:0}
+  .rail a.is-active,.rail a:focus-visible{opacity:1}
+}
+@media (max-width: 420px){
+  .tl li{grid-template-columns:1fr;gap:0}
+  .fund{font-size:.92em}
+}
+</style>
+</head>
+<body>
+
+<div class="tone" aria-hidden="true"></div>
+<div class="gutter-box" aria-hidden="true"></div>
+<svg class="stage" id="stage" aria-hidden="true" focusable="false"><defs id="defs"></defs><g id="scene"></g></svg>
+
+<main id="main">
+
+<!-- 00 · Hero ------------------------------------------------------ -->
+<section class="chapter hero" id="top" data-from="2003" data-to="2003">
+  <div class="wrap">
+    <p class="eyebrow">Innovation &amp; business · A case study</p>
+    <h1><span class="t1">Theranos</span><span class="vh"> — </span><span class="t2">The rise, the fall and the failures behind it</span></h1>
+    <figure class="figp pic-half figp-right">
+      <picture>
+        <source data-pic="finger-stick-blood-drop-narrow" srcset="assets/pixel/finger-stick-blood-drop-narrow.png" media="(max-width: 899.98px)">
+        <img data-pic="finger-stick-blood-drop-wide" src="assets/pixel/finger-stick-blood-drop-wide.png" width="324" height="192" alt="Pixel-art rendering of a fingertip seen from the side, with a single small drop of blood sitting on its upper surface.">
+      </picture>
+      <figcaption>
+        <span class="cap-what">A fingertip with a single drop of blood.</span>
+        <span class="cap-src">Neoteryx, generic finger-stick sampling illustration.</span>
+      </figcaption>
+    </figure>
+    <p class="lede"><span class="lead">Theranos promised</span> easier blood testing, attracted major funding and partnerships, then collapsed. This analysis explains how the company gained credibility before its technology had adequate validation.</p>
+    <p class="byline">Zurab Tushuri</p>
+    <div class="key">
+      <p class="key-title">How to read the evidence</p>
+      <p class="key-list">
+        <span class="ev ev-alleg">SEC civil allegation</span>
+        <span class="ev ev-court">criminal verdict</span>
+        <span class="ev ev-court">court finding</span>
+        <span class="ev ev-claim">company claim</span>
+        <span class="ev">peer-reviewed study</span>
+        <span class="ev">reported figure</span>
+        <span class="ev ev-claim">participant recollection</span>
+      </p>
+      <p class="key-note">Contested figures carry the type of record they come from. Unlabelled events are matters of public record: announcements, regulator notices and court dockets.</p>
+    </div>
+    <p class="cue" aria-hidden="true">Scroll to follow one drop of blood &darr;</p>
+  </div>
+</section>
+
+<!-- 01 · Promise --------------------------------------------------- -->
+<section class="chapter" id="promise" data-from="2003" data-to="2013">
+  <div class="wrap">
+    <p class="eyebrow"><span class="num">01</span>The pitch</p>
+    <h2>The promise was easy to understand</h2>
+    <figure class="figp pic-thumb figp-right">
+      <picture>
+        <source data-pic="theranos-nanotainer-narrow" srcset="assets/pixel/theranos-nanotainer-narrow.png" media="(max-width: 899.98px)">
+        <img data-pic="theranos-nanotainer-wide" src="assets/pixel/theranos-nanotainer-wide.png" width="216" height="292" alt="Pixel-art rendering of a small specimen tube with a barcode label, holding a pool of dark red blood, held between fingertips.">
+      </picture>
+      <figcaption>
+        <span class="cap-what">The nanotainer made the vision tangible.</span>
+        <span class="cap-src">Theranos nanotainer promotional photograph, reproduced by Labroots.</span>
+      </figcaption>
+    </figure>
+    <p><span class="lead">In 2003</span> Elizabeth Holmes founded Theranos to make blood testing easier. Early work centred on a proprietary analyzer and pharmaceutical trials.</p>
+    <p>Blood draws could be uncomfortable, and a laboratory visit took time and could create price uncertainty. Theranos offered small samples, convenient collection and quicker results at lower advertised prices.</p>
+    <figure class="stat">
+      <p class="big" aria-hidden="true">50%</p>
+      <figcaption>The 2013 launch advertised prices at <strong>50% of Medicare reimbursement rates or less</strong>. <span class="ev ev-claim"><span class="vh">(</span>company claim<span class="vh">)</span></span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- 02 · Funding --------------------------------------------------- -->
+<section class="chapter" id="funding" data-from="2013" data-to="2014">
+  <div class="wrap">
+    <p class="eyebrow"><span class="num">02</span>Capital</p>
+    <h2>Funding grew from early backing to very large rounds</h2>
+    <figure class="figp pic-half figp-left">
+      <picture>
+        <source data-pic="fortune-cover-2014-narrow" srcset="assets/pixel/fortune-cover-2014-narrow.png" media="(max-width: 899.98px)">
+        <img data-pic="fortune-cover-2014-wide" src="assets/pixel/fortune-cover-2014-wide.png" width="324" height="380" alt="Pixel-art rendering of Fortune magazine's 2014 cover: the masthead across the top and a portrait of Elizabeth Holmes in a black high-necked top, with the cover's red cover lines beside her.">
+      </picture>
+      <figcaption>
+        <span class="cap-what">Fortune’s 2014 cover, an artifact of contemporary media framing.</span>
+        <span class="cap-src">Fortune 2014 cover, reproduced by Nonfictionfilm.com.</span>
+      </figcaption>
+    </figure>
+    <p><span class="lead">Funding grew</span> in stages. In 2009 Sunny Balwani guaranteed a credit line and joined as president and chief operating officer.</p>
+    <table class="fund">
+      <caption class="vh">Funding raised and reported valuation, by period</caption>
+      <thead>
+        <tr><th scope="col">Period</th><th scope="col"><span class="m m-fund">Funding raised</span></th><th scope="col"><span class="m m-val">Reported valuation</span></th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">2004</th><td class="fv">more than $6m<span class="sub">Reuters timeline <span class="ev"><span class="vh">(</span>reported figure<span class="vh">)</span></span></span></td><td class="vv">$30m</td></tr>
+        <tr><th scope="row">2010</th><td class="fv">a further $45m<span class="sub">Reuters timeline <span class="ev"><span class="vh">(</span>reported figure<span class="vh">)</span></span></span></td><td class="vv">$1bn</td></tr>
+        <tr><th scope="row">Late 2013–2015</th><td class="fv">over $700m<span class="sub">in two rounds <span class="ev ev-alleg"><span class="vh">(</span>SEC civil allegation<span class="vh">)</span></span></span></td><td class="vv">around $9bn<span class="sub">reported for 2014</span></td></tr>
+      </tbody>
+    </table>
+    <div class="measures">
+      <p class="measures-title">Three different measures</p>
+      <dl>
+        <div><dt class="m m-fund">Funding raised</dt><dd>Cash that investors put in.</dd></div>
+        <div><dt class="m m-val">Valuation</dt><dd>The price a funding round implies for the whole company.</dd></div>
+        <div><dt class="m m-rev">Operating revenue</dt><dd>Money earned from customers.</dd></div>
+      </dl>
+      <p>These reports are not a complete funding ledger, and historical reports can overlap.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 03 · Persuasion ------------------------------------------------ -->
+<section class="chapter long" id="persuasion" data-from="2014" data-to="2014">
+  <div class="wrap">
+    <p class="eyebrow"><span class="num">03</span>Investors</p>
+    <h2>How Theranos persuaded investors</h2>
+    <ol class="steps">
+      <li><div><h3>Meetings with Holmes</h3><p>Personal access built belief in the founder.</p></div></li>
+      <li><div><h3>Live demonstrations</h3><p>The SEC alleged that some demonstration samples actually ran on third-party machines. <span class="ev ev-alleg"><span class="vh">(</span>SEC civil allegation<span class="vh">)</span></span></p></div></li>
+      <li><div><h3>Investor binders</h3><p>Projections, media profiles and reports carrying pharmaceutical logos that falsely implied independent endorsement. <span class="ev ev-alleg"><span class="vh">(</span>SEC civil allegation<span class="vh">)</span></span></p></div></li>
+    </ol>
+    <p class="pull">The signals appeared to confirm one another, and none of them was an independent check.</p>
+    <p class="muted">The criminal trial established knowing false representations to investors. <span class="ev ev-court"><span class="vh">(</span>criminal verdict<span class="vh">)</span></span></p>
+  </div>
+</section>
+
+<!-- 04 · Prestige -------------------------------------------------- -->
+<section class="chapter long" id="prestige" data-from="2014" data-to="2014">
+  <div class="wrap">
+    <p class="eyebrow"><span class="num">04</span>The board</p>
+    <h2>Prestige helped the company gain credibility</h2>
+    <figure class="figp pic-half figp-right">
+      <picture>
+        <source data-pic="biden-theranos-facility-2015-narrow" srcset="assets/pixel/biden-theranos-facility-2015-narrow.png" media="(max-width: 899.98px)">
+        <img data-pic="biden-theranos-facility-2015-wide" src="assets/pixel/biden-theranos-facility-2015-wide.png" width="324" height="248" alt="Pixel-art rendering of two figures standing in a wide industrial room, beneath a large banner reading theranos, with equipment cabinets on either side.">
+      </picture>
+      <figcaption>
+        <span class="cap-what">Joe Biden visits the Theranos production facility, July 2015.</span>
+        <span class="cap-src">San Francisco Chronicle, Biden and Holmes at the Theranos production facility, 23 July 2015.</span>
+      </figcaption>
+    </figure>
+    <p><span class="lead">Prominent directors</span> and heavy press attention made the company easy to believe. These signals could encourage confidence without establishing whether the technology worked.</p>
+    <p class="board-title">Directors included</p>
+    <ul class="board">
+      <li><strong>George Shultz</strong><span>Former US Secretary of State</span></li>
+      <li><strong>Henry Kissinger</strong><span>Former Secretary of State and National Security Advisor</span></li>
+      <li><strong>James Mattis</strong><span>Retired Marine general, later Secretary of Defense</span></li>
+    </ul>
+    <p>Their expertise was in diplomacy and security. In July 2015 the sitting Vice President visited the production facility.</p>
+    <p class="pull">Reputation is not technical verification.</p>
+  </div>
+</section>
+
+<!-- 05 · Walgreens ------------------------------------------------- -->
+<section class="chapter long" id="walgreens" data-from="2014" data-to="2014">
+  <div class="wrap">
+    <p class="eyebrow"><span class="num">05</span>The channel</p>
+    <h2>Walgreens connected the company to patients</h2>
+    <figure class="figp pic-half figp-left">
+      <picture>
+        <source data-pic="walgreens-theranos-check-in-narrow" srcset="assets/pixel/walgreens-theranos-check-in-narrow.png" media="(max-width: 899.98px)">
+        <img data-pic="walgreens-theranos-check-in-wide" src="assets/pixel/walgreens-theranos-check-in-wide.png" width="324" height="148" alt="Pixel-art rendering of a hanging in-store sign reading theranos, with a small red drop-on-a-fingertip symbol beside the wordmark.">
+      </picture>
+      <figcaption>
+        <span class="cap-what">A Theranos check-in area inside a Walgreens store.</span>
+        <span class="cap-src">Business Insider, Theranos check-in area inside a Walgreens store.</span>
+      </figcaption>
+    </figure>
+    <p><span class="lead">Leaders targeted</span> retail testing in 2010, while the miniLab was still in development. <span class="ev ev-alleg"><span class="vh">(</span>SEC civil allegation<span class="vh">)</span></span> The Walgreens service launched in 2013 and retail patient testing began. Walgreens supplied a familiar place to collect samples without Theranos building a retail network of its own.</p>
+    <ol class="flow">
+      <li>A clinician requests tests</li>
+      <li>The sample is collected in store</li>
+      <li>A laboratory processes it</li>
+      <li>The result returns to the clinician</li>
+    </ol>
+    <p>Testing payments had to cover collection, transport, processing and quality control, and research still needed cash.</p>
+  </div>
+</section>
+
+<!-- 06 · Technology ------------------------------------------------ -->
+<section class="chapter long" id="technology" data-from="2014" data-to="2014">
+  <div class="wrap">
+    <p class="eyebrow"><span class="num">06</span>The gap</p>
+    <h2>The technology and the finances did not match the story</h2>
+    <div class="figs">
+      <figure class="fig">
+        <p class="big" aria-hidden="true">~12<span class="of">of 200+</span></p>
+        <figcaption>The SEC alleged that the proprietary analyzer ran about <strong>12 test types from a menu exceeding 200</strong>; other equipment handled the rest. <span class="ev ev-alleg"><span class="vh">(</span>SEC civil allegation<span class="vh">)</span></span></figcaption>
+        <div class="g200" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <p class="g200-cap" aria-hidden="true">Each square is one test type (200 shown).</p>
+      </figure>
+      <figure class="fig">
+        <h3>Independent testing, 2016</h3>
+        <figcaption>Theranos results were <strong>more variable than those of standard laboratories</strong>. <span class="ev"><span class="vh">(</span>peer-reviewed study<span class="vh">)</span></span></figcaption>
+      </figure>
+    </div>
+    <figure class="figp pic-full figp-full">
+      <picture>
+        <source data-pic="edison-trial-exhibit-5388-narrow" srcset="assets/pixel/edison-trial-exhibit-5388-narrow.png" media="(max-width: 899.98px)">
+        <img data-pic="edison-trial-exhibit-5388-wide" src="assets/pixel/edison-trial-exhibit-5388-wide.png" width="486" height="390" alt="Pixel-art rendering of the Theranos analyzer: a wedge-shaped desktop box with a dark angled upper face and a square screen set into it, photographed against a plain background.">
+      </picture>
+      <figcaption>
+        <span class="cap-what">Theranos analyzer, trial exhibit 5388.</span>
+        <span class="cap-src">Theranos analyzer image from trial exhibit 5388, reproduced by KTVU.</span>
+      </figcaption>
+    </figure>
+    <p>Diluting a tiny sample was the physical constraint: dilution lowers the concentration each test has to detect.</p>
+    <figure class="rev">
+      <figcaption class="rev-cap">2014 revenue: what investors were told vs. what operations earned <span class="ev ev-alleg"><span class="vh">(</span>SEC civil allegation<span class="vh">)</span></span></figcaption>
+      <div class="rev-row">
+        <span class="rev-label m m-proj">Projection given to investors</span>
+        <span class="bar" aria-hidden="true"><i></i></span>
+        <span class="rev-val">over $100m</span>
+      </div>
+      <div class="rev-row">
+        <span class="rev-label m m-rev">Operating revenue</span>
+        <span class="bar" aria-hidden="true"><i class="hair"></i></span>
+        <span class="rev-val red">just over $100,000</span>
+      </div>
+      <p class="small">Bars to scale; the second is drawn at a one-pixel minimum.</p>
+    </figure>
+    <p class="pull">Using conventional equipment was not inherently wrong. Misrepresenting current capability and financial performance was the deeper problem.</p>
+  </div>
+</section>
+
+<!-- 07 · Inside ---------------------------------------------------- -->
+<section class="chapter fall" id="inside" data-from="2014" data-to="2015">
+  <div class="wrap">
+    <p class="eyebrow"><span class="num">07</span>Governance</p>
+    <h2>What went wrong inside the company</h2>
+    <ol class="steps">
+      <li><div><h3>Expansion before adequate validation</h3><p>A broad retail promise exceeded the demonstrated analyzer scope.</p></div></li>
+      <li><div><h3>Misleading current claims</h3><p>Technology, financial projections and apparent endorsements. Investors could not judge the actual state of the business.</p></div></li>
+      <li><div><h3>Weak challenge to leadership</h3><p>Concentrated voting control <span class="ev ev-alleg"><span class="vh">(</span>SEC civil allegation<span class="vh">)</span></span> and resistance to employee concerns. Contrary evidence struggled to change major decisions.</p></div></li>
+    </ol>
+    <p class="pull">An unsuccessful experiment can be reported honestly. The fraud conviction concerned knowing misrepresentation. <span class="ev ev-court"><span class="vh">(</span>criminal verdict<span class="vh">)</span></span></p>
+  </div>
+</section>
+
+<!-- 08 · Employees ------------------------------------------------- -->
+<section class="chapter fall" id="employees" data-from="2015" data-to="2015">
+  <div class="wrap">
+    <p class="eyebrow"><span class="num">08</span>Whistleblowers</p>
+    <h2>Employees carried the warning outside</h2>
+    <figure class="figp pic-half figp-right">
+      <picture>
+        <source data-pic="cheung-shultz-narrow" srcset="assets/pixel/cheung-shultz-narrow.png" media="(max-width: 899.98px)">
+        <img data-pic="cheung-shultz-wide" src="assets/pixel/cheung-shultz-wide.png" width="324" height="164" alt="Pixel-art rendering of Erika Cheung and Tyler Shultz standing side by side at a later public event, both facing the camera.">
+      </picture>
+      <figcaption>
+        <span class="cap-what">Erika Cheung and Tyler Shultz at a later public event.</span>
+        <span class="cap-src">Getty Images / KQED, Erika Cheung and Tyler Shultz.</span>
+      </figcaption>
+    </figure>
+    <p><span class="lead">Technical staff</span> could observe quality problems. Outsiders had limited access to those facts.</p>
+    <ul class="board">
+      <li><strong>Erika Cheung</strong><span>Contacted health regulators.</span></li>
+      <li><strong>Tyler Shultz</strong><span>Became a source for journalist John Carreyrou. He later described unsuccessful internal challenges and legal pressure after raising concerns. <span class="ev ev-claim"><span class="vh">(</span>participant recollection<span class="vh">)</span></span></span></li>
+    </ul>
+    <p class="pull">Reporting channels need protection, independent review and authority to act.</p>
+  </div>
+</section>
+
+<!-- 09 · Scrutiny -------------------------------------------------- -->
+<section class="chapter fall" id="scrutiny" data-from="2015" data-to="2016">
+  <div class="wrap">
+    <p class="eyebrow"><span class="num">09</span>2015–2016</p>
+    <h2>Scrutiny progressively broke the public narrative</h2>
+    <figure class="figp pic-half figp-left">
+      <picture>
+        <source data-pic="carreyrou-bad-blood-narrow" srcset="assets/pixel/carreyrou-bad-blood-narrow.png" media="(max-width: 899.98px)">
+        <img data-pic="carreyrou-bad-blood-wide" src="assets/pixel/carreyrou-bad-blood-wide.png" width="324" height="236" alt="Pixel-art rendering of journalist John Carreyrou beside the artwork for his later book, whose title Bad Blood is set large in red capitals.">
+      </picture>
+      <figcaption>
+        <span class="cap-what">John Carreyrou beside artwork for his later book, <cite>Bad Blood</cite>.</span>
+        <span class="cap-src">The New School / Strand Bookstore, John Carreyrou and Bad Blood event artwork.</span>
+      </figcaption>
+    </figure>
+    <p><span class="lead">Scrutiny overlapped.</span> Scientific questions, investigative reporting and laboratory inspection each arrived from a different direction, and each made the company’s claims easier to challenge.</p>
+    <ol class="tl">
+      <li><span class="when">Feb 2015</span><p>John Ioannidis questions the evidence gap in <cite>JAMA</cite>, before the major newspaper investigation.</p></li>
+      <li><span class="when">Jul 2015</span><p>The FDA clears one named HSV-1 assay.</p></li>
+      <li><span class="when">15 Oct 2015</span><p>John Carreyrou’s <cite>Wall Street Journal</cite> investigation compares company claims with insider information.</p></li>
+      <li><span class="when">Late 2015</span><p>CMS inspects the Newark laboratory and finds serious deficiencies.</p></li>
+      <li><span class="when">Mar 2016</span><p>CMS sanctions follow.</p></li>
+    </ol>
+    <p class="muted">Evidence accumulated over time; one article alone does not explain the collapse.</p>
+  </div>
+</section>
+
+<!-- 10 · The end --------------------------------------------------- -->
+<section class="chapter fall" id="ended" data-from="2016" data-to="2022">
+  <div class="wrap">
+    <p class="eyebrow"><span class="num">10</span>2016–2022</p>
+    <h2>Regulators and partners ended the business</h2>
+    <figure class="figp pic-half figp-right">
+      <picture>
+        <source data-pic="theranos-headquarters-narrow" srcset="assets/pixel/theranos-headquarters-narrow.png" media="(max-width: 899.98px)">
+        <img data-pic="theranos-headquarters-wide" src="assets/pixel/theranos-headquarters-wide.png" width="324" height="260" alt="Pixel-art rendering of the circular entrance monument outside the Theranos headquarters, carrying the company wordmark, set against dark trees.">
+      </picture>
+      <figcaption>
+        <span class="cap-what">Theranos headquarters, contextual image.</span>
+        <span class="cap-src">Vanity Fair, Theranos headquarters photograph.</span>
+      </figcaption>
+    </figure>
+    <p><span class="lead">Regulators and partners</span> closed the business within three months of each other in 2016.</p>
+    <ol class="tl">
+      <li><span class="when">May 2016</span><p>Theranos voids two years of Edison results and issues tens of thousands of corrected reports.</p></li>
+      <li><span class="when">12 Jun 2016</span><p>Walgreens ends the partnership and closes all 40 Arizona wellness centres, acting on the proposed sanctions.</p></li>
+      <li><span class="when">7 Jul 2016</span><p>CMS revokes the Newark laboratory’s CLIA certificate and bars its owners and operators from running a lab for at least two years.</p></li>
+      <li><span class="when">Sep 2018</span><p>Sale attempts fail and Theranos dissolves.</p></li>
+      <li><span class="when">2022</span><p>Holmes is convicted of fraud. Balwani’s verdict named patients. <span class="ev ev-court"><span class="vh">(</span>criminal verdict<span class="vh">)</span></span></p></li>
+    </ol>
+    <p class="pull">Without a licence or a channel, the business could not operate.</p>
+    <p class="muted">Holmes and Balwani had separate trials and different verdicts.</p>
+  </div>
+</section>
+
+<!-- 11 · After ----------------------------------------------------- -->
+<section class="chapter fall" id="after" data-from="2023" data-to="2026">
+  <div class="wrap">
+    <p class="eyebrow"><span class="num">11</span>2023–2026</p>
+    <h2>After the convictions</h2>
+    <ol class="tl">
+      <li><span class="when">30 May 2023</span><p>Holmes enters prison on a sentence of 11 years and 3 months. <span class="ev ev-court"><span class="vh">(</span>court finding<span class="vh">)</span></span></p></li>
+      <li><span class="when">2023–25</span><p>About $452m in restitution is ordered jointly and severally. Both convictions are upheld on appeal in 2025. <span class="ev ev-court"><span class="vh">(</span>court finding<span class="vh">)</span></span></p></li>
+      <li><span class="when">16 Jan 2026</span><p>A 90-year exclusion from federal healthcare programs is upheld. <span class="ev ev-court"><span class="vh">(</span>court finding<span class="vh">)</span></span></p></li>
+      <li><span class="when">26 Mar 2026</span><p>The prison sentence is reduced to 10 years and 3 months; the conviction is unchanged. <span class="ev ev-court"><span class="vh">(</span>court finding<span class="vh">)</span></span></p></li>
+    </ol>
+    <figure class="stat">
+      <p class="big" aria-hidden="true">135<span class="of">&rarr;</span>123</p>
+      <figcaption>Months: the sentence as imposed, and as reduced in March 2026.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- 12 · Lessons --------------------------------------------------- -->
+<section class="chapter fall lessons" id="lessons" data-from="2026" data-to="2026">
+  <div class="wrap">
+    <p class="eyebrow"><span class="num">12</span>Lessons</p>
+    <h2>What the case teaches</h2>
+    <div class="cols">
+      <div>
+        <h3>Credibility is not proof</h3>
+        <p>A famous board, press coverage and a retail partner raised money. None of them tested the device.</p>
+      </div>
+      <div>
+        <h3>Validation sets the date</h3>
+        <p>Retail launch was promised before the analyzer could deliver the advertised menu.</p>
+      </div>
+      <div>
+        <h3>Disclosure is a choice</h3>
+        <p>A failed experiment is survivable. Misstating current capability is fraud.</p>
+      </div>
+    </div>
+    <p class="closing">Credibility scaled faster than evidence.</p>
+    <p class="closing-sub">For an innovator, the controllable variable is not certainty, but disclosure.</p>
+    <div class="final-drop" aria-hidden="true">
+      <svg viewBox="-1.2 -2 2.4 3.2" width="22" height="29.33" focusable="false"><circle r="1"/><path d="M0,-1.75C0.45,-1.05 1,-0.55 1,0A1,1 0 0 1 -1,0C-1,-0.55 -0.45,-1.05 0,-1.75Z"/></svg>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- Sources --------------------------------------------------------- -->
+<footer class="chapter fall sources" id="sources" data-from="2026" data-to="2026">
+  <div class="wrap">
+    <p class="eyebrow">Records cited</p>
+    <h2>Sources</h2>
+    <ol>
+      <li>U.S. Securities and Exchange Commission. <cite>SEC v. Elizabeth Holmes and Theranos</cite>, complaint, 14 March 2018; and “Theranos, Holmes and Balwani charged with massive fraud”, 14 March 2018. Holmes and Theranos settled without admitting or denying the allegations.</li>
+      <li>U.S. Department of Justice, Northern District of California. “Theranos founder Elizabeth Holmes found guilty of investor fraud”, 4 January 2022 (verdict returned 3 January); “Elizabeth Holmes sentenced to more than 11 years”, 18 November 2022; “Theranos president sentenced to more than 12 years”, 7 December 2022.</li>
+      <li>U.S. Court of Appeals, Ninth Circuit. <cite>United States v. Holmes</cite>, order and amended opinion, 24 February 2025; amended 22 December 2025.</li>
+      <li>U.S. District Court, Northern District of California. Order granting motion for modification of sentence, document 1816, 26 March 2026.</li>
+      <li>U.S. Department of Health and Human Services, Departmental Appeals Board. <cite>Elizabeth A. Holmes</cite>, DAB No. 3222, 16 January 2026.</li>
+      <li>Walgreens / Theranos. “Theranos selects Walgreens as a long-term partner”, 9 September 2013; Walgreens, “Walgreens terminates relationship with Theranos”, 12 June 2016.</li>
+      <li>U.S. District Court, Delaware. <cite>Walgreen Co. v. Theranos</cite>, report and recommendation, filing 22, 27 July 2017.</li>
+      <li>Brendan Pierson, Reuters. “Events leading up to the trial of Theranos founder Elizabeth Holmes”, 8 September 2021.</li>
+      <li>Roger Parloff, <cite>Fortune</cite>. “This CEO is out for blood”, 12 June 2014; <cite>Fortune</cite>, “A singular board at Theranos”, 12 June 2014.</li>
+      <li>John P. A. Ioannidis, <cite>JAMA</cite>. “Stealth research: is biomedical innovation happening outside the peer-reviewed literature?”, 17 February 2015.</li>
+      <li>John Carreyrou, <cite>The Wall Street Journal</cite>. “Hot startup Theranos has struggled with its blood-test technology”, 15 October 2015; “Blood-testing firm Theranos to dissolve”, September 2018.</li>
+      <li>Kidd, B. A., et al. “Evaluation of direct-to-consumer low-volume lab tests in healthy adults.” <cite>Journal of Clinical Investigation</cite>, 28 March 2016, with corrigendum 1 July 2016.</li>
+      <li>CNN Money. “Theranos corrects thousands of blood tests”, 19 May 2016. <cite>Fortune</cite>, “Theranos’ Elizabeth Holmes banned from operating labs for two years”, 8 July 2016, reporting the CMS sanctions dated 7 July 2016. Reuters, “Embattled blood-testing firm Theranos to dissolve”, 5 September 2018.</li>
+      <li>Emily Primeaux, Association of Certified Fraud Examiners. “Whistleblower helped dismantle biotech juggernaut Theranos”, 1 September 2019. Stacey Paris McCutcheon, Fogarty Innovation. “Principled decision making: a fireside chat with Tyler Shultz”, 27 April 2023.</li>
+    </ol>
+
+    <p class="eyebrow">Image credits</p>
+    <h2 class="vh">Image credits</h2>
+    <ul class="credits">
+      <li><span class="slide">01</span>Neoteryx, generic finger-stick sampling illustration. A generic blood sample, not a verified Theranos procedure.</li>
+      <li><span class="slide">02</span>Holmes at TechCrunch Disrupt 2014, via Academic Influence.</li>
+      <li><span class="slide">03</span>Theranos nanotainer promotional photograph, reproduced by Labroots.</li>
+      <li><span class="slide">04</span>Fortune 2014 cover, reproduced by Nonfictionfilm.com. Shown as an artifact of contemporary media framing.</li>
+      <li><span class="slide">06</span>San Francisco Chronicle, Biden and Holmes at the Theranos production facility, 23 July 2015.</li>
+      <li><span class="slide">07</span>Business Insider, Theranos check-in area inside a Walgreens store.</li>
+      <li><span class="slide">08</span>Theranos analyzer image from trial exhibit 5388, reproduced by KTVU. A trial-exhibit image, not a frame from the dramatization.</li>
+      <li><span class="slide">10</span>Getty Images / KQED, Erika Cheung and Tyler Shultz. From a later event; it does not depict the original disclosures.</li>
+      <li><span class="slide">11</span>The New School / Strand Bookstore, John Carreyrou and Bad Blood event artwork. The book cover is shown for context, not cited as a book that was read.</li>
+      <li><span class="slide">12</span>Vanity Fair, Theranos headquarters photograph.</li>
+    </ul>
+    <p class="fine">Every photograph is reproduced as true-resolution pixel art, generated with <span lang="en">proper-pixel-art</span> (MIT) and locked to four of this page’s own tokens: black, the mid grey <span lang="en">--stage</span>, white and the accent <span lang="en">--red</span>. A photograph of Holmes outside the federal courthouse in San Jose (Reuters / The Indian Express) would not resolve legibly at the width it would be shown and was left out.</p>
+    <p class="fine">Prepared by Zurab Tushuri for a university innovation-business class. Figures are labelled with the record they come from; none is an estimate of patient harm.</p>
+  </div>
+</footer>
+
+<!-- Chronology rail -------------------------------------------------- -->
+<nav class="rail" aria-label="Chronology, 2003 to 2026">
+  <div class="rail-bg" aria-hidden="true"><i></i><i class="cool"></i></div>
+  <div class="rail-inner">
+    <div class="rail-fill" aria-hidden="true"></div>
+    <div class="rail-dot" aria-hidden="true"></div>
+    <ol>
+      <li style="--p:0"><a href="#promise" data-year="2003">2003</a></li>
+      <li style="--p:.0435"><a href="#funding" data-year="2004">2004</a></li>
+      <li style="--p:.2609"><a href="#funding" data-year="2009">2009</a></li>
+      <li style="--p:.3043"><a href="#funding" data-year="2010">2010</a></li>
+      <li style="--p:.4348"><a href="#promise" data-year="2013">2013</a></li>
+      <li style="--p:.4783"><a href="#funding" data-year="2014">2014</a></li>
+      <li style="--p:.5217"><a href="#scrutiny" data-year="2015">2015</a></li>
+      <li style="--p:.5652"><a href="#ended" data-year="2016">2016</a></li>
+      <li style="--p:.6522"><a href="#ended" data-year="2018">2018</a></li>
+      <li style="--p:.8261"><a href="#ended" data-year="2022">2022</a></li>
+      <li style="--p:.8696"><a href="#after" data-year="2023">2023</a></li>
+      <li style="--p:.9565"><a href="#after" data-year="2025">2025</a></li>
+      <li style="--p:1"><a href="#after" data-year="2026">2026</a></li>
+    </ol>
+  </div>
+</nav>
+
+<script>
+(function () {
+  'use strict';
+  var D = document, W = window, doc = D.documentElement;
+  var NS = 'http://www.w3.org/2000/svg';
+
+  var scene = D.getElementById('scene'), defs = D.getElementById('defs');
+  var tone = D.querySelector('.tone'), railCool = D.querySelector('.rail-bg .cool');
+  var gbox = D.querySelector('.gutter-box');
+  var secs = [].slice.call(D.querySelectorAll('[data-from]'));
+  var yFrom = secs.map(function (s) { return +s.getAttribute('data-from'); });
+  var yTo = secs.map(function (s) { return +s.getAttribute('data-to'); });
+  var railInner = D.querySelector('.rail-inner'), railFill = D.querySelector('.rail-fill'), railDot = D.querySelector('.rail-dot');
+  var marks = [].slice.call(D.querySelectorAll('.rail a[data-year]')).map(function (a) { return { a: a, y: +a.getAttribute('data-year') }; });
+  var finalWrap = D.querySelector('.final-drop'), finalSvg = finalWrap ? finalWrap.querySelector('svg') : null;
+  if (!scene || !secs.length || !W.requestAnimationFrame) return;
+
+  function mq(q) { return W.matchMedia ? W.matchMedia(q) : { matches: false }; }
+  function onMq(m, fn) { if (m.addEventListener) m.addEventListener('change', fn); else if (m.addListener) m.addListener(fn); }
+  var mqR = mq('(prefers-reduced-motion: reduce)'), mqN = mq('(max-width: 899.98px)');
+  var reduced = !!mqR.matches;
+
+  /* Static drop state per section when reduced motion is requested */
+  var KEYS = [0.12, 2.5, 3.62, 4.9, 5.47, 6.97, 7.95, 8.9, 9.95, 10.95, 11.95, 12.96, 13.5, 14.5];
+
+  /* The drop’s keyframes are authored on the original fifteen-section timeline.
+     The 2003–13 timeline section was removed, so section progress is remapped
+     onto that timeline instead of retiming the keyframes: the promise section
+     now carries the fall and the nanotainer fill that it once shared with the
+     deleted section. Continuous and monotonic at both joins (1 and 2). */
+  function stage(t) { return t < 1 ? t : t < 2 ? 1 + 2 * (t - 1) : t + 1; }
+
+  /* ---------- helpers ---------- */
+  function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+  function seg(t, a, b) { return clamp((t - a) / (b - a), 0, 1); }
+  function lerp(a, b, u) { return a + (b - a) * u; }
+  function sm(u) { return u * u * (3 - 2 * u); }
+  function eio(u) { return u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2; }
+  function eout(u) { return 1 - Math.pow(1 - u, 3); }
+  function f(n) { return Math.round(n * 100) / 100; }
+  function el(tag, attrs, parent) {
+    var e = D.createElementNS(NS, tag);
+    for (var k in attrs) if (attrs.hasOwnProperty(k)) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function text(str, attrs, parent) { var e = el('text', attrs, parent); e.textContent = str; return e; }
+  function tf(e, s) { if (e._t !== s) { e.setAttribute('transform', s); e._t = s; } }
+  function op(e, v) { v = Math.round(clamp(v, 0, 1) * 1000) / 1000; if (e._o !== v) { e.style.opacity = v; e._o = v; } }
+  function rng(seed) { return function () { seed |= 0; seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function cubic(s, u) {
+    var v = 1 - u, a = v * v * v, b = 3 * v * v * u, c = 3 * v * u * u, d = u * u * u;
+    return [a * s[0][0] + b * s[1][0] + c * s[2][0] + d * s[3][0], a * s[0][1] + b * s[1][1] + c * s[2][1] + d * s[3][1]];
+  }
+  function poly(pts, u) {
+    var lens = [], tot = 0, i;
+    for (i = 1; i < pts.length; i++) { var l = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); lens.push(l); tot += l; }
+    var tg = u * tot;
+    for (i = 0; i < lens.length; i++) {
+      if (tg <= lens[i] || i === lens.length - 1) { var k = lens[i] ? clamp(tg / lens[i], 0, 1) : 1; return [lerp(pts[i][0], pts[i + 1][0], k), lerp(pts[i][1], pts[i + 1][1], k)]; }
+      tg -= lens[i];
+    }
+    return pts[pts.length - 1];
+  }
+
+  var TEAR = 'M0,-1.75C0.45,-1.05 1,-0.55 1,0A1,1 0 0 1 -1,0C-1,-0.55 -0.45,-1.05 0,-1.75Z';
+
+  /* ---------- scene geometry (design units) ---------- */
+  var LAYOUTS = {
+    desk: {
+      W: 400, H: 1000, labels: true, cx: 200, fHalf: 30, fTipY: 86, dropR: 13,
+      tube: { x: 200, top: 440, w: 34, h: 74, fill: 22 }, fallEnd: 500, enterDy: 120,
+      mach: { x: 60, y: 560, w: 280, h: 320, slot: 22, r: 10 },
+      pool: { x: 100, y: 650, w: 200, h: 46, cx: 200, cy: 673, rx: 12, ry: 7, sx: 7.4, sy: 2.1 },
+      dil: [[62, 170], [62, 186], [338, 230], [338, 214]],
+      spread: 26, rowY: 726, rowX: [120, 152, 184, 216, 248, 280], dr: 8,
+      cham: { x: 84, y: 770, w: 80, h: 76, cx: 124, cy: 808 },
+      conduit: 'M146,752H316V900', chY: 752, chX: 316, chBottom: 916,
+      tp: { x: 236, y: 900, w: 140, h: 72 },
+      tpEnds: [[258, 926], [284, 948], [310, 926], [336, 948], [360, 926]],
+      ret: [[[124, 808], [124, 690], [318, 680], [318, 560]], [[318, 560], [318, 440], [300, 330], [312, 268]]],
+      resR: 11, clin: { x: 350, y: 236, k: 1 },
+      brk: [240, 470], frags: 9, fragD: [45, 125], fragR: [3, 7], drift: 60, frag0: [1.78, 72, 6],
+      rest: [200, 740], restR: 7,
+      trailTop: 138, trailBot: 428, trailN: 9, trailL: 12, retN: 9
+    },
+    mob: {
+      W: 64, H: 1000, labels: false, cx: 32, fHalf: 13, fTipY: 70, dropR: 7,
+      tube: { x: 32, top: 360, w: 16, h: 44, fill: 12 }, fallEnd: 396, enterDy: 120,
+      mach: { x: 4, y: 480, w: 56, h: 330, slot: 10, r: 6 },
+      pool: { x: 9, y: 542, w: 46, h: 40, cx: 32, cy: 562, rx: 5, ry: 4, sx: 3.8, sy: 2 },
+      dil: [[6, 24], [58, 40]],
+      spread: 6, rowY: 610, rowX: [14, 26, 38, 50], dr: 4.5,
+      cham: { x: 8, y: 636, w: 24, h: 62, cx: 20, cy: 667 },
+      conduit: 'M30,628H52V836', chY: 628, chX: 52, chBottom: 848,
+      tp: { x: 34, y: 836, w: 28, h: 60 },
+      tpEnds: [[42, 856], [54, 870], [42, 884]],
+      ret: [[[20, 667], [20, 600], [52, 580], [52, 480]], [[52, 480], [52, 400], [26, 320], [26, 240]]],
+      resR: 5.5, clin: { x: 48, y: 224, k: 0.55 },
+      brk: [30, 430], frags: 6, fragD: [9, 22], fragR: [1.6, 3.4], drift: 40, frag0: [1.7, 16, 3],
+      rest: [32, 760], restR: 3.6,
+      trailTop: 96, trailBot: 350, trailN: 7, trailL: 8, retN: 6
+    }
+  };
+
+  var L = null, mode = null, G = {}, RP = null, trail = [], frags = [];
+
+  function dropShape(parent) {
+    var g = el('g', {}, parent);
+    var round = el('circle', { r: 1, 'class': 'blood' }, g);
+    var tear = el('path', { d: TEAR, 'class': 'blood' }, g);
+    el('ellipse', { cx: -0.36, cy: -0.22, rx: 0.18, ry: 0.3, 'class': 'gloss' }, g);
+    return { g: g, round: round, tear: tear };
+  }
+
+  function sampleReturn() {
+    var pts = [], cum = [], tot = 0;
+    L.ret.forEach(function (sg, si) {
+      for (var j = si ? 1 : 0; j <= 48; j++) {
+        var p = cubic(sg, j / 48);
+        if (pts.length) { var q = pts[pts.length - 1]; tot += Math.hypot(p[0] - q[0], p[1] - q[1]); }
+        pts.push(p); cum.push(tot);
+      }
+    });
+    RP = { pts: pts, cum: cum, tot: tot };
+  }
+  function along(u) {
+    var tg = clamp(u, 0, 1) * RP.tot, c = RP.cum, lo = 0, hi = c.length - 1;
+    while (hi - lo > 1) { var mid = (lo + hi) >> 1; if (c[mid] < tg) lo = mid; else hi = mid; }
+    var a = RP.pts[lo], b = RP.pts[hi], span = (c[hi] - c[lo]) || 1, k = clamp((tg - c[lo]) / span, 0, 1);
+    return [lerp(a[0], b[0], k), lerp(a[1], b[1], k), Math.atan2(b[1] - a[1], b[0] - a[0]) * 180 / Math.PI];
+  }
+
+  function build(key) {
+    mode = key; L = LAYOUTS[key];
+    while (scene.firstChild) scene.removeChild(scene.firstChild);
+    while (defs.firstChild) defs.removeChild(defs.firstChild);
+    G = {}; trail = []; frags = [];
+    var rnd = rng(11), i, j;
+    sampleReturn();
+
+    /* journey trail */
+    G.trail = el('g', {}, scene);
+    for (j = 0; j < L.trailN; j++) {
+      var ty = lerp(L.trailTop, L.trailBot, (j + 0.5) / L.trailN);
+      trail.push({ e: el('line', { x1: -L.trailL / 2, y1: 0, x2: L.trailL / 2, y2: 0, 'class': 'tr' }, G.trail), x: L.cx, y: ty, a: 90, kind: 0, r1: rnd(), r2: rnd() });
+    }
+    /* the return trail is drawn only once the result has left the analyzer */
+    var fOut = 0;
+    for (j = 0; j < RP.pts.length; j++) if (RP.pts[j][1] < L.mach.y - 10) { fOut = RP.cum[j] / RP.tot; break; }
+    for (j = 0; j < L.retN; j++) {
+      var fr = fOut + (0.94 - fOut) * (j + 0.5) / L.retN, pa = along(fr);
+      trail.push({ e: el('line', { x1: -L.trailL / 2, y1: 0, x2: L.trailL / 2, y2: 0, 'class': 'tr' }, G.trail), x: pa[0], y: pa[1], a: pa[2], kind: 1, f: fr, r1: rnd(), r2: rnd() });
+    }
+
+    /* fingertip */
+    var fx = L.cx, fh = L.fHalf, fc = L.fTipY - fh;
+    G.finger = el('g', {}, scene);
+    el('path', { d: 'M' + (fx - fh) + ',-2000V' + fc + 'A' + fh + ',' + fh + ' 0 0 0 ' + (fx + fh) + ',' + fc + 'V-2000', 'class': 'st skin' }, G.finger);
+    [0.32, 0.58, 0.84].forEach(function (q) {
+      var R = fh * q, cy = fc + fh * 0.32;
+      el('path', { d: 'M' + (fx - R) + ',' + cy + 'A' + R + ',' + R + ' 0 0 1 ' + (fx + R) + ',' + cy, 'class': 'st faint' }, G.finger);
+    });
+
+    /* Edison analyzer */
+    var m = L.mach, x0 = m.x, x1 = m.x + m.w, y0 = m.y, y1 = m.y + m.h, rr = m.r, sl = L.cx - m.slot, sr = L.cx + m.slot, P = L.pool, c = L.cham;
+    G.mach = el('g', {}, scene);
+    el('path', { d: 'M' + sr + ',' + y0 + 'H' + (x1 - rr) + 'Q' + x1 + ',' + y0 + ' ' + x1 + ',' + (y0 + rr) + 'V' + (y1 - rr) + 'Q' + x1 + ',' + y1 + ' ' + (x1 - rr) + ',' + y1 + 'H' + (x0 + rr) + 'Q' + x0 + ',' + y1 + ' ' + x0 + ',' + (y1 - rr) + 'V' + (y0 + rr) + 'Q' + x0 + ',' + y0 + ' ' + (x0 + rr) + ',' + y0 + 'H' + sl, 'class': 'st body' }, G.mach);
+    el('path', { d: 'M' + sl + ',' + y0 + 'v' + (L.labels ? 10 : 5) + 'M' + sr + ',' + y0 + 'v' + (L.labels ? 10 : 5), 'class': 'st faint' }, G.mach);
+    el('rect', { x: P.x, y: P.y, width: P.w, height: P.h, rx: Math.min(P.h / 2, 18), 'class': 'st faint' }, G.mach);
+    el('path', { d: 'M' + x0 + ',' + P.cy + 'H' + P.x + 'M' + x1 + ',' + P.cy + 'H' + (P.x + P.w), 'class': 'st faint dash' }, G.mach);
+    el('path', { d: L.conduit, 'class': 'conduit', 'stroke-width': L.dr * 2.6 }, G.mach);
+    el('path', { d: L.conduit, 'class': 'st faint dash' }, G.mach);
+    el('rect', { x: c.x, y: c.y, width: c.w, height: c.h, rx: L.labels ? 6 : 3, 'class': 'st faint' }, G.mach);
+    G.hl = el('rect', { x: c.x, y: c.y, width: c.w, height: c.h, rx: L.labels ? 6 : 3, 'class': 'hl' }, G.mach);
+    G.scan = el('line', { x1: c.x + 4, x2: c.x + c.w - 4, y1: 0, y2: 0, 'class': 'scan' }, G.mach);
+    G.tp = el('g', {}, G.mach);
+    el('rect', { x: L.tp.x, y: L.tp.y, width: L.tp.w, height: L.tp.h, rx: L.labels ? 6 : 3, 'class': 'st dash' }, G.tp);
+    if (L.labels) {
+      text('Edison', { x: x0 + 16, y: y0 + 27, 'class': 'lbl', 'font-size': 14 }, G.mach);
+      for (i = 0; i < 3; i++) el('circle', { cx: x1 - 18 - i * 11, cy: y0 + 22, r: 2.6, 'class': 'dot' }, G.mach);
+      text('+ diluent', { x: P.x + 4, y: P.y - 9, 'class': 'lbl', 'font-size': 11 }, G.mach);
+      text('Third-party', { x: L.tp.x - 12, y: L.tp.y + 28, 'class': 'lbl', 'font-size': 12, 'text-anchor': 'end' }, G.tp);
+      text('equipment', { x: L.tp.x - 12, y: L.tp.y + 45, 'class': 'lbl', 'font-size': 12, 'text-anchor': 'end' }, G.tp);
+    }
+
+    /* nanotainer */
+    var tb = L.tube, tx0 = tb.x - tb.w / 2, tx1 = tb.x + tb.w / 2, tt = tb.top, tbot = tb.top + tb.h, rad = tb.w / 2;
+    var tubeD = 'M' + tx0 + ',' + tt + 'V' + (tbot - rad) + 'A' + rad + ',' + rad + ' 0 0 0 ' + tx1 + ',' + (tbot - rad) + 'V' + tt;
+    var cp = el('clipPath', { id: 'tubeclip' }, defs);
+    el('path', { d: tubeD + 'Z' }, cp);
+    G.tube = el('g', {}, scene);
+    var cg = el('g', { 'clip-path': 'url(#tubeclip)' }, G.tube);
+    G.tubeFill = el('rect', { x: tx0 - 2, y: tbot - tb.fill, width: tb.w + 4, height: tb.fill + 2, 'class': 'blood' }, cg);
+    G.ripple = el('ellipse', { cx: 0, cy: 0, rx: tb.w * 0.32, ry: L.labels ? 2.2 : 1.4, 'class': 'ripple' }, G.tube);
+    el('path', { d: tubeD, 'class': 'st' }, G.tube);
+    el('path', { d: 'M' + (tx0 - tb.w * 0.14) + ',' + tt + 'H' + (tx1 + tb.w * 0.14), 'class': 'st' }, G.tube);
+    G.tubeLbl = L.labels ? text('Nanotainer', { x: tx1 + 14, y: tbot - 18, 'class': 'lbl', 'font-size': 12 }, G.tube) : null;
+
+    /* dilution */
+    G.pool = el('g', {}, scene);
+    G.poolPale = el('ellipse', { rx: P.rx, ry: P.ry, 'class': 'pale' }, G.pool);
+    G.poolRed = el('ellipse', { rx: P.rx, ry: P.ry, 'class': 'blood' }, G.pool);
+    G.xfer = el('circle', { r: L.dr * 0.5, 'class': 'blood' }, scene);
+    G.dil = L.dil.map(function () { return el('circle', { r: L.dr * 0.55, 'class': 'diluent' }, scene); });
+
+    /* droplets */
+    G.dropsG = el('g', {}, scene);
+    G.drops = L.rowX.map(function (_, k) {
+      var g = el('g', {}, G.dropsG);
+      el('circle', { r: L.dr, 'class': 'dl' }, g);
+      return { g: g, core: k === 0 ? el('circle', { r: L.dr, 'class': 'blood' }, g) : null };
+    });
+
+    /* clinician */
+    G.clin = el('g', { transform: 'translate(' + L.clin.x + ',' + L.clin.y + ') scale(' + L.clin.k + ')' }, scene);
+    el('circle', { r: 13, 'class': 'st skin' }, G.clin);
+    el('path', { d: 'M-24,46Q-24,22 0,22Q24,22 24,46', 'class': 'st' }, G.clin);
+    el('path', { d: 'M-10,24Q-10,38 0,38Q10,38 10,24', 'class': 'st faint' }, G.clin);
+    el('circle', { cy: 41, r: 3, 'class': 'st' }, G.clin);
+    if (L.labels) text('Clinician', { x: 0, y: 68, 'class': 'lbl', 'font-size': 12, 'text-anchor': 'middle' }, G.clin);
+
+    /* result: confident vs uncertain */
+    var R = L.resR;
+    G.res = el('g', {}, scene);
+    G.resC = el('g', {}, G.res);
+    el('circle', { r: R, 'class': 'blood' }, G.resC);
+    el('path', { d: 'M' + f(-0.45 * R) + ',0L' + f(-0.1 * R) + ',' + f(0.33 * R) + 'L' + f(0.46 * R) + ',' + f(-0.32 * R), 'class': 'tick' }, G.resC);
+    G.resU = el('g', {}, G.res);
+    el('circle', { r: R, 'class': 'unc' }, G.resU);
+    text('?', { x: 0, y: f(R * 0.45), 'class': 'q', 'font-size': f(R * 1.3), 'text-anchor': 'middle' }, G.resU);
+
+    /* main drop */
+    G.drop = dropShape(scene);
+
+    /* fragments and the survivor */
+    G.fragG = el('g', {}, scene);
+    for (i = 0; i < L.frags; i++) {
+      var fd = i === 0 ? { a: L.frag0[0], d: L.frag0[1], r: L.frag0[2] } : {
+        a: lerp(-0.22, 1.22, rnd()) * Math.PI, d: lerp(L.fragD[0], L.fragD[1], rnd()), r: lerp(L.fragR[0], L.fragR[1], rnd())
+      };
+      fd.drift = lerp(0.35, 1, rnd()) * L.drift;
+      fd.fade = i === 0 ? 1e9 : 10.05 + (i - 1) * (2.4 / Math.max(1, L.frags - 2)) + (rnd() - 0.5) * 0.12;
+      fd.e = i === 0 ? null : el('circle', { r: 1, 'class': 'blood' }, G.fragG);
+      frags.push(fd);
+    }
+    G.surv = dropShape(scene);
+
+    lastT = -1;
+  }
+
+  /* ---------- measurement ---------- */
+  var Hh = 0, maxS = 1, tops = [], hs = [], sc = 1, ox = 0, oy = 0, narrow = false, railLen = 0, lastRail = -1;
+  function measure() {
+    narrow = !!mqN.matches;
+    var key = narrow ? 'mob' : 'desk';
+    if (key !== mode) build(key);
+    Hh = W.innerHeight || doc.clientHeight;
+    var y = W.pageYOffset || doc.scrollTop || 0;
+    for (var i = 0; i < secs.length; i++) { var r = secs[i].getBoundingClientRect(); tops[i] = r.top + y; hs[i] = Math.max(1, r.height); }
+    maxS = Math.max(1, doc.scrollHeight - Hh);
+    var a = gbox.getBoundingClientRect();
+    var aw = a.width || 1, ah = a.height || Hh;
+    sc = Math.min(aw / L.W, ah / L.H);
+    ox = a.left + (aw - L.W * sc) / 2;
+    oy = a.top + (ah - L.H * sc) / 2;
+    scene.setAttribute('transform', 'translate(' + f(ox) + ',' + f(oy) + ') scale(' + sc.toFixed(4) + ')');
+    var rr = railInner.getBoundingClientRect();
+    railLen = narrow ? rr.width : rr.height;
+    lastRail = -1; force = true;
+  }
+
+  function computeT() {
+    var y = W.pageYOffset || doc.scrollTop || 0, p = clamp(y / maxS, 0, 1), ref = y + Hh * p, n = secs.length;
+    if (ref <= tops[0]) return 0;
+    for (var i = n - 1; i >= 0; i--) if (ref >= tops[i]) return Math.min(n - 0.0001, i + clamp((ref - tops[i]) / hs[i], 0, 0.9999));
+    return 0;
+  }
+
+  /* ---------- the drop, as a function of one progress value ---------- */
+  function update(t) {
+    var P = L.pool, tb = L.tube, c = L.cham, i, u, e;
+    var mIn = sm(seg(t, 3.0, 3.6)), out = 1 - sm(seg(t, 9.0, 9.6));
+
+    op(G.finger, (1 - 0.7 * mIn) * out);
+    var cool = sm(seg(t, 7.6, 9.4));
+    op(tone, cool); if (railCool) op(railCool, cool);
+
+    /* 1-2: swell, tremble, release, fall */
+    var r = L.dropR, x = L.cx, y, sx = 1, sy = 1, k = 1, tw = 1, dO = 1, fallY = -1e4;
+    if (t < 0.26) {
+      k = lerp(0.55, 1, eout(seg(t, 0, 0.2)));
+      var amp = reduced ? 0 : sm(seg(t, 0.05, 0.2)) * (1 - 0.5 * seg(t, 0.24, 0.26));
+      var w = Math.sin(t * 170) * amp;
+      sx = 1 + 0.08 * w; sy = 1 - 0.06 * w + 0.14 * sm(seg(t, 0.17, 0.26));
+      x = L.cx + w * r * 0.08;
+      y = L.fTipY + 1.75 * r * k * sy;
+    } else if (t < 1.85) {
+      u = seg(t, 0.26, 1.85);
+      e = (1 - Math.cos(Math.PI * u)) / 2;
+      var v = Math.sin(Math.PI * u);
+      y = lerp(L.fTipY + 1.75 * r * 1.14, L.fallEnd, e); fallY = y;
+      sy = 1 + 0.32 * v + 0.14 * (1 - sm(seg(u, 0, 0.12))); sx = 1 - 0.13 * v;
+      tw = 1 - sm(seg(u, 0.5, 0.88));
+    } else {
+      y = L.fallEnd; fallY = y;
+      var mm = seg(t, 1.85, 2.08); k = 1 - 0.7 * mm; dO = 1 - mm; tw = 0;
+    }
+    tf(G.drop.g, 'translate(' + f(x) + ',' + f(y) + ') scale(' + f(r * k * sx) + ',' + f(r * k * sy) + ')');
+    op(G.drop.tear, tw); op(G.drop.g, dO);
+
+    /* 3: nanotainer */
+    var bot = tb.top + tb.h;
+    op(G.tube, sm(seg(t, 0.9, 1.4)) * (1 - sm(seg(t, 4.7, 5.05))));
+    tf(G.tube, 'translate(0,' + f(L.enterDy * eio(seg(t, 3.65, 4.3))) + ')');
+    var fl = eout(seg(t, 1.86, 2.14)) * (1 - seg(t, 4.35, 4.65));
+    tf(G.tubeFill, 'translate(0,' + bot + ') scale(1,' + Math.max(fl, 0.001).toFixed(3) + ') translate(0,' + (-bot) + ')');
+    if (G.tubeLbl) op(G.tubeLbl, 1 - seg(t, 3.4, 3.62));
+    var ru0 = seg(t, 1.85, 2.3);
+    tf(G.ripple, 'translate(' + tb.x + ',' + f(bot - tb.fill * fl) + ') scale(' + f(lerp(0.3, 1.5, ru0)) + ',1)');
+    op(G.ripple, ru0 > 0 && ru0 < 1 ? (1 - ru0) * 0.85 : 0);
+
+    /* 4: Edison */
+    op(G.mach, mIn * out);
+    tf(G.mach, 'translate(0,' + f((1 - mIn) * 16) + ')');
+    op(G.tp, 0.45 + 0.55 * sm(seg(t, 6.9, 7.15)));
+    op(G.hl, sm(seg(t, 6.5, 6.7)) * (1 - sm(seg(t, 7.4, 7.8))));
+    var su = seg(t, 6.5, 7.0);
+    op(G.scan, su > 0 && su < 1 ? 1 : 0);
+    tf(G.scan, 'translate(0,' + f(c.y + 5 + (c.h - 10) * (0.5 - 0.5 * Math.cos(su * Math.PI * 4))) + ')');
+
+    /* sample leaves the tube into the dilution chamber */
+    var tubeBot = bot + L.enterDy, xu = seg(t, 4.35, 4.62);
+    op(G.xfer, xu > 0 && xu < 1 ? 1 : 0);
+    tf(G.xfer, 'translate(' + P.cx + ',' + f(lerp(tubeBot - 2, P.cy, eio(xu))) + ')');
+
+    /* it spreads and pales */
+    var pin = eout(seg(t, 4.45, 4.7)), dil = sm(seg(t, 4.7, 5.45)), spl = sm(seg(t, 5.5, 5.9));
+    var g0 = lerp(0.3, 1, pin) * (1 - 0.5 * spl);
+    tf(G.pool, 'translate(' + P.cx + ',' + P.cy + ') scale(' + f(lerp(1, P.sx, dil) * g0) + ',' + f(lerp(1, P.sy, dil) * g0) + ')');
+    op(G.poolRed, pin * (1 - 0.75 * dil) * (1 - spl));
+    op(G.poolPale, pin * dil * (1 - spl));
+    for (i = 0; i < G.dil.length; i++) {
+      var ds = 4.62 + i * 0.1, du = seg(t, ds, ds + 0.3), d = L.dil[i];
+      tf(G.dil[i], 'translate(' + f(lerp(d[0], d[1], eio(du))) + ',' + P.cy + ')');
+      op(G.dil[i], (du > 0 ? 1 : 0) * (1 - sm(seg(du, 0.75, 1))) * out);
+    }
+
+    /* it splits; one droplet is processed, the rest drain to third-party equipment */
+    var N = L.rowX.length;
+    for (i = 0; i < N; i++) {
+      var s0 = 5.5 + i * 0.05, ap = sm(seg(t, s0, s0 + 0.12)), ee = eio(seg(t, s0, s0 + 0.45));
+      var ex = L.rowX[i], ey = L.rowY;
+      var X = lerp(P.cx + (i - (N - 1) / 2) * L.spread, ex, ee), Y = lerp(P.cy, ey, ee), o = ap;
+      if (i === 0) {
+        var pu = eio(seg(t, 6.2, 6.5));
+        X = lerp(X, c.cx, pu); Y = lerp(Y, c.cy, pu);
+        op(G.drops[0].core, sm(seg(t, 6.6, 6.95)));
+        o *= 1 - seg(t, 7.98, 8.02);
+      } else {
+        var dsx = 7.0 + (i - 1) * 0.1, dd = eio(seg(t, dsx, dsx + 0.45));
+        if (dd > 0) { var pp = poly([[ex, ey], [ex, L.chY], [L.chX, L.chY], [L.chX, L.chBottom], L.tpEnds[i - 1]], dd); X = pp[0]; Y = pp[1]; }
+      }
+      tf(G.drops[i].g, 'translate(' + f(X) + ',' + f(Y) + ') scale(' + f(lerp(0.4, 1, ap)) + ')');
+      op(G.drops[i].g, o * out);
+    }
+
+    /* 5: the result returns to the clinician, confident → uncertain */
+    op(G.clin, sm(seg(t, 7.55, 7.95)) * out);
+    var ru = eio(seg(t, 8.0, 8.75)), pr = along(ru), RX = pr[0], RY = pr[1];
+    var fu = seg(t, 9.15, 9.55);
+    if (fu > 0) { var end = along(1), fe = fu * fu; RX = lerp(end[0], L.brk[0], fe); RY = lerp(end[1], L.brk[1], fe); }
+    tf(G.res, 'translate(' + f(RX) + ',' + f(RY) + ')');
+    op(G.res, seg(t, 7.98, 8.02) * (1 - seg(t, 9.53, 9.58)));
+    var conf = 1;
+    if (t >= 8) {
+      var th = 2 * seg(t, 8.0, 8.62) - 1, sn = Math.sin(t * Math.PI * 2 * 6.5);
+      conf = clamp((sn - th) * 3, 0, 1);
+    }
+    op(G.resC, conf); op(G.resU, 1 - conf);
+
+    /* journey trail, and its break */
+    for (i = 0; i < trail.length; i++) {
+      var s = trail[i], vis;
+      if (s.kind === 0) vis = t < 0.26 ? 0 : t < 1.85 ? sm(seg(fallY, s.y - 6, s.y + 10)) : 1;
+      else vis = t < 8 ? 0 : sm(seg(ru, s.f - 0.05, s.f + 0.01));
+      var b = sm(seg(t, 9.0 + i * 0.035, 9.65 + i * 0.035));
+      var dy = b * b * L.H * 0.2 * (0.6 + 0.4 * s.r1), rot = b * (s.r2 - 0.5) * 140;
+      tf(s.e, 'translate(' + f(s.x) + ',' + f(s.y + dy) + ') rotate(' + f(s.a + rot) + ')');
+      op(s.e, vis * 0.6 * (1 - b));
+    }
+
+    /* 6: fragments scatter and fade through the collapse */
+    var sp = eout(seg(t, 9.55, 10.25)), on = seg(t, 9.53, 9.6), late = Math.max(0, t - 10.25);
+    for (i = 1; i < frags.length; i++) {
+      var q = frags[i];
+      var FX = clamp(L.brk[0] + Math.cos(q.a) * q.d * sp + Math.sin(t * 1.7 + i) * 1.5 * Math.min(1, late), 6, L.W - 6);
+      var FY = L.brk[1] + Math.sin(q.a) * q.d * sp * 0.85 + q.drift * late * 0.45;
+      tf(q.e, 'translate(' + f(FX) + ',' + f(FY) + ') scale(' + f(q.r * lerp(0.4, 1, sp)) + ')');
+      op(q.e, on * (1 - sm(seg(t, q.fade, q.fade + 0.45))));
+    }
+
+    /* 7: one small drop remains, beneath the closing statement */
+    var q0 = frags[0];
+    var SX = L.brk[0] + Math.cos(q0.a) * q0.d * sp, SY = L.brk[1] + Math.sin(q0.a) * q0.d * sp * 0.85, SR = q0.r * lerp(0.4, 1, sp);
+    var restU = eio(seg(t, 12.45, 12.95));
+    SX = lerp(SX, L.rest[0], restU); SY = lerp(SY, L.rest[1], restU); SR = lerp(SR, L.restR, restU);
+    var sO = on, sT = 0, inflow = 0;
+    if (reduced) {
+      if (t >= 13) sO = 0;
+      inflow = 1;
+    } else if (t > 12.8 && finalSvg) {
+      var rc = finalSvg.getBoundingClientRect();
+      if (rc.width > 0) {
+        var unit = rc.width / 2.4, ax = rc.left + 1.2 * unit, ay = rc.top + 2 * unit;
+        var kA = clamp((Hh * 1.02 - ay) / (Hh * 0.24), 0, 1), ke = eio(kA);
+        SX = lerp(SX, (ax - ox) / sc, ke); SY = lerp(SY, (ay - oy) / sc, ke); SR = lerp(SR, unit / sc, ke);
+        sT = sm(seg(kA, 0.3, 0.85));
+        var cf = sm(seg(kA, 0.86, 1));
+        sO *= 1 - cf; inflow = cf;
+      }
+    }
+    tf(G.surv.g, 'translate(' + f(SX) + ',' + f(SY) + ') scale(' + f(SR) + ')');
+    op(G.surv.g, sO); op(G.surv.tear, sT);
+    if (finalWrap) op(finalWrap, inflow);
+  }
+
+  /* ---------- chronology rail ---------- */
+  var lastActive = null;
+  function rail(t) {
+    var i = Math.min(secs.length - 1, Math.floor(t)), yr = yFrom[i] + (yTo[i] - yFrom[i]) * (t - i);
+    var fr = clamp((yr - 2003) / 23, 0, 1);
+    if (Math.abs(fr - lastRail) > 1e-4) {
+      lastRail = fr;
+      railFill.style.transform = (narrow ? 'scaleX(' : 'scaleY(') + fr.toFixed(4) + ')';
+      var px = (fr * railLen).toFixed(1);
+      railDot.style.transform = narrow ? 'translate3d(' + px + 'px,0,0)' : 'translate3d(0,' + px + 'px,0)';
+    }
+    var act = null;
+    for (var j = 0; j < marks.length; j++) if (marks[j].y <= yr + 0.01) act = marks[j];
+    if (act !== lastActive) {
+      if (lastActive) { lastActive.a.classList.remove('is-active'); lastActive.a.removeAttribute('aria-current'); }
+      if (act) { act.a.classList.add('is-active'); act.a.setAttribute('aria-current', 'step'); }
+      lastActive = act;
+    }
+  }
+
+  /* ---------- loop: rAF only when something changed ---------- */
+  var pending = false, force = true, needMeasure = true, lastT = -1;
+  function frame() {
+    pending = false;
+    if (needMeasure) { measure(); needMeasure = false; }
+    var tr = computeT();
+    var td = reduced ? KEYS[Math.min(KEYS.length - 1, Math.floor(tr))] : stage(tr);
+    if (force || td !== lastT || (!reduced && td > 12.8)) { update(td); lastT = td; force = false; }
+    rail(tr);
+  }
+  function req() { if (!pending) { pending = true; W.requestAnimationFrame(frame); } }
+  function remeasure() { needMeasure = true; req(); }
+
+  W.addEventListener('scroll', req, { passive: true });
+  W.addEventListener('resize', remeasure);
+  W.addEventListener('load', remeasure);
+  W.addEventListener('pageshow', remeasure);
+  onMq(mqR, function () { reduced = !!mqR.matches; force = true; req(); });
+  onMq(mqN, remeasure);
+  if (W.ResizeObserver) new ResizeObserver(remeasure).observe(D.getElementById('main'));
+
+  /* IntersectionObserver: reveal chapters, mark the current one */
+  measure();
+  if ('IntersectionObserver' in W) {
+    var ioReveal = new IntersectionObserver(function (es) {
+      es.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('is-in'); ioReveal.unobserve(en.target); } });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.02 });
+    var ioCurrent = new IntersectionObserver(function (es) {
+      es.forEach(function (en) { en.target.classList.toggle('is-current', en.isIntersecting); });
+      req();
+    }, { rootMargin: '-49% 0px -49% 0px' });
+    secs.forEach(function (s) {
+      var r = s.getBoundingClientRect();
+      if (r.top < Hh * 0.92 && r.bottom > 0) s.classList.add('is-in'); else ioReveal.observe(s);
+      ioCurrent.observe(s);
+    });
+    doc.classList.add('reveal-on');
+  }
+  frame();
+})();
+</script>
+</body>
+</html>
