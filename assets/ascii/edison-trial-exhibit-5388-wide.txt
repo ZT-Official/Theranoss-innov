@@ -1,0 +1,42 @@
+<_l                                                                                                 
+>+I        ...''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''.....           
+i~I    ,:::::::::::::::::::::::::::::::::::::::::::::::::::::::;:::::;;;;;;;IIIIIIIIllll:^`'        
+!<;   .;I;;;;:::;;;;;::::::::::::::::::::::::::::::::::::::::::;;;;;;II;IIIIIIIlllll!iii>!;,`.      
+l>;   `;;;;::::::;;;::::::::::::::::::::::::::::::::::::::::::::;;;;;I;;;;;;IIIIllllll!!-->I,`.     
+Ii:  .^;;;;::::::;;;::::::::::::::::::,"^^^^^",::::::::::::::::::::;;;;;;;;;IIIIllllll!![}+!:`.     
+:l,  .^;;;;::::::;;;:::::::;:::,"^^`^,;!~?1{-<l:,^^^^",::;;;;:::::::;;;;;;;;IIIIIlllllll{{_i:^.     
+,I"  .^;;;;::::::;::::::,"^^^,;!<?{/xcUL0OZZO0LUcx/{?<l:^'''^:;::::::;;;;;;;;;IIIlllllll{{_i:^.     
+":^  .^;;;;;;::;;;:::^^:!~](jvULOmmmZO0QQQLLLQ00OOOZZOOO0CJn?,`;::::::;;;;;;;;;IIIllllll{{_i:^.     
+^,`  .^;;;;;;;;;;;:;^{wa##*abpmO00QQ0000000000OZqdh#&%B%Mowh$d)^,;:::::;;;;;;;IIIIllllll{{_i:^.     
+`"`  .^;;;;;;;;;;;:;^[$$$$$$@B8M*abpwwwwwqdh*W%@B8#kmCzvnnucq$$QI^;:::;;;;;;;;IIIlllllll{{_i:^.   ..
+'`'  .^;;;;;;I;;;;::;'[%$@$$$$$$$$$@%Mo#W8%&#bZJzuxrnvXcnYCJX0W$a-`;;;;;;;;;IIIIllllll!!{{_i:^.  ...
+.'.  .^IIIIIII;;;;:::; ~#$%BBB@@@$$$$%B@BBwtrjjnuxnYf)xc\tzUJYCa$%f^;I;I;;;IIIIIlllll!!!1{_i:^.  .'.
+...  .^IIIIIII;;;;;;;;,.Ib$8%%8&&&88&M8%BB%ZvYYYv)\nu/|uUnxzJJYUdB$CI:lIIIIIIIlllllll!!!1{_i:^.  .'.
+ ..  .^IlllllIIII;;;;;,"'^Q$888&&&WMM*hoM%B@dvYYXXxtuYvt|vx<-XJYYm8$k+;!llllllllll!!!!!i1{_i:^.  .'.
+     .^l!lllllIIIIIIII,^"`.c$8&&WWMMMM*aka8%@acYCYYzx|ut>?v/}jcUUYL*$M-l!!!llllll!!!!iii1{_i:^.  .`'
+     .^!!!!lllllllllII:^^"^ /%8WWWWMMM#MakhW8@MYYLJJv-|YzjrJXcccuvvJo$0I>ii!!!!!!!!!!iii1{_i:^.  .`'
+     .^!i!!!llllllllII;^^^^" ]M%MWMMMMM##*hk#8%&OJQLLCXcUYzvunuXQp*W8%zl<>iiiii!!!!!iiii1{_i:^.  .`'
+     .^iiii!!!!!!lllllI^^^^^" >k%#MMMMM##M#ahoW8%bJLLCJYcvcU0d#%@B8W*Mx!~<>>iiii!!!!iiii1{_i:^.  .`'
+     .^i>>>iiiii!!!!!!l"^^^^^".:OB#MMMMMM###oh*&W%aJXYUQwhM%@@%&WMMMM8f>+~<<>>iii!!!!iii1{_i:^.  .`'
+     .^><<>>>iiii!!!!!!,^^^^^^"``X%##MMM#####*a8%W8*whM%BB%&WWMW&&&MM#1<++~~>>iii!!!!!i!{{_i:^.  .`'
+     .^><>>>>iiiiiii!!!:^^^^^^^"^ f&M#M#MMMM#M*8$@%%B8&WWWWW&88%%8WoMh[+__+~<>i!!!!!!!!!1{_i:^.  .`'
+     .^i<>>>>iiiiiiii!i:^"^^^^^^"" {#W*##MMMMM#%$$B88WWWW&8%%%8&M#*oMq-___+~<>i!llll!!!!{{_i:^.  .`'
+     .^i<>>>>iiiiiii!!!_^`"^^^^^^^, ~k&*##MMMMM%$$$@%8WW%B8&M#####ooM0+___~<i!llllllll!l{{_i:^.  .`.
+     .^i>>>>>iiiii!!!iI1X``"^^^^^^^,.;Z8o*##MMM8$$$$BWMW$%########ooMY~-_~>illllllllllll{{_i:^.  .`.
+     .^i>>iiii!!i!!!!!ilv0;.""^^^^^^"`^Y8**#MMM8$$$$BWMW$8##*###**aa*n<_~illIIIlllllllll{{_i:^.  .'.
+..   .^!iiiiii!!!!!!iii>IxZ~.^^"""""","'jWM*MMM8@$$$%WMW$8*******oha#t~~!IIIIIIIIIIIIllI{{_i:^.  .'.
+..   .^!i!i!!!!!!!!iii>><!{c{I^`^",,,,,,.1#W#MM8@@$@%M#&$&*******o*aZ}>lI;I;II;;;;IIIIII{{_i:^.  .. 
+...  .^l!lllllllllllll!!i<i>[{[+l:,"",:::`_k8*M&BB@B8M#W$W******hmc1>l;;;;;;;;;;;;;IIIII{{_i:^.   . 
+.'.  .^lllllllIIIIIIIIIIIIllII!>><>iI;:,,;^lZ8*W%BB%8M#W@M***hmc|+I;IIII;;;;;;;;;;;;;III{{_i:^.     
+.'.  .^llIIIIIIII;II;;;;:::::::,,:;li>>iI::^"X8W8%%%&#*M8#kOu1~lIIIlllIII;;;;;;;;;;;;;;I{{_i:^.     
+...  .^IIIIIII;;;;::::::::::::::::::,:I!>~<iI`t&B8888WMkQn{<I;IllllllIIII;;;;;;;;;;;;;;;{{_i:^.     
+..   .^;IIIII;;;;::::::::::::::::::::::,::Ii~~I1b@@BoLr[>;::;IIIIIIIIIIII;;;;;;;;;;;;;;;{{_i:^.     
+ .   .^IIIIIIII;;;;;;::::::::::::::::::::::,,;lI>tUj?!;:;IIIIIIIIIIIIIIIIII;;IIIIIIIIIII{{_i:^.     
+     .^lllIIIII;;;;;::::::,::,,,,,,,,,,,,,,,,,","``^,:;;;IIIIII;;;;;;;;;;;;;;;;;;;;;;;II}{_i:`.     
+     .^I!!ii>>>>>>>>>iiiiiiiiiiiiiii!!!!!!!!iiiiii>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>[]<l,`.     
+      '^:l<_?[[}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}[[?_>l:^'      
+       .`":Il!!ii!!!!!!!!!!!!!!!!!!!i!!!!ii!!!!iiiii!i!!!!!iiii!!!!!!!!!!!!!!!!!!!iii!!l;:"`.       
+         ..'``^^^^^^^^^^^^^^^^^^^^^````^```^`^````````^^^^``````^^^^^^^^^^^^^^^^^^^^^^```'.         
+                                    ^'. .'` ' .`'''''^    .`''''                                    
+                                    >_-)i-[?}^,}?)[]<?_{{?;{}]-~   ^l>I:~>l<!l~ili"!<!ii>i<>.       
+                                      .`  .'.. .....  ',,' ...     ^>>iI~~!ll>~!I>;i~i>><>~<.       

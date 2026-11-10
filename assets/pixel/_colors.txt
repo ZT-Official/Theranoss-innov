@@ -1,0 +1,22 @@
+biden-theranos-facility-2015-narrow.png	10	#000000 #1a1a1a #333333 #4c4c4c #666666 #808080 #b2b2b2 #cccccc #e6e6e6 #ffffff
+biden-theranos-facility-2015-wide.png	10	#000000 #1a1a1a #333333 #4c4c4c #666666 #808080 #b2b2b2 #cccccc #e6e6e6 #ffffff
+carreyrou-bad-blood-narrow.png	11	#000000 #1a1a1a #2d0508 #333333 #4c4c4c #666666 #670c11 #808080 #999999 #b2b2b2 #cccccc
+carreyrou-bad-blood-wide.png	11	#000000 #1a1a1a #2d0508 #333333 #4c4c4c #666666 #670c11 #808080 #999999 #b2b2b2 #cccccc
+cheung-shultz-narrow.png	11	#000000 #1a1a1a #333333 #4c4c4c #666666 #808080 #999999 #b2b2b2 #cccccc #e6e6e6 #ffffff
+cheung-shultz-wide.png	11	#000000 #1a1a1a #333333 #4c4c4c #666666 #808080 #999999 #b2b2b2 #cccccc #e6e6e6 #ffffff
+edison-trial-exhibit-5388-narrow.png	11	#000000 #1a1a1a #333333 #4c4c4c #666666 #808080 #999999 #b2b2b2 #cccccc #e6e6e6 #ffffff
+edison-trial-exhibit-5388-wide.png	11	#000000 #1a1a1a #333333 #4c4c4c #666666 #808080 #999999 #b2b2b2 #cccccc #e6e6e6 #ffffff
+finger-stick-blood-drop-narrow.png	10	#2d0508 #4c4c4c #666666 #670c11 #808080 #999999 #b2b2b2 #cccccc #e6e6e6 #ffffff
+finger-stick-blood-drop-wide.png	10	#2d0508 #4c4c4c #666666 #670c11 #808080 #999999 #b2b2b2 #cccccc #e6e6e6 #ffffff
+fortune-cover-2014-narrow.png	11	#1a1a1a #333333 #4c4c4c #666666 #670c11 #808080 #999999 #a1121b #b2b2b2 #e6e6e6 #ffffff
+fortune-cover-2014-wide.png	11	#1a1a1a #333333 #4c4c4c #666666 #670c11 #808080 #999999 #a1121b #b2b2b2 #e6e6e6 #ffffff
+holmes-federal-courthouse-narrow.png	12	#000000 #333333 #4c4c4c #666666 #670c11 #808080 #999999 #b2b2b2 #c3676d #cccccc #e6e6e6 #ffffff
+holmes-federal-courthouse-wide.png	12	#000000 #333333 #4c4c4c #666666 #670c11 #808080 #999999 #b2b2b2 #c3676d #cccccc #e6e6e6 #ffffff
+holmes-techcrunch-disrupt-2014-narrow.png	10	#000000 #1a1a1a #333333 #4c4c4c #666666 #808080 #999999 #b2b2b2 #e6e6e6 #ffffff
+holmes-techcrunch-disrupt-2014-wide.png	10	#000000 #1a1a1a #333333 #4c4c4c #666666 #808080 #999999 #b2b2b2 #e6e6e6 #ffffff
+theranos-headquarters-narrow.png	11	#000000 #1a1a1a #333333 #4c4c4c #666666 #808080 #999999 #b2b2b2 #cccccc #e6e6e6 #ffffff
+theranos-headquarters-wide.png	11	#000000 #1a1a1a #333333 #4c4c4c #666666 #808080 #999999 #b2b2b2 #cccccc #e6e6e6 #ffffff
+theranos-nanotainer-narrow.png	12	#000000 #1a1a1a #2d0508 #333333 #4c4c4c #670c11 #808080 #999999 #a1121b #b2b2b2 #cccccc #ffffff
+theranos-nanotainer-wide.png	12	#000000 #1a1a1a #2d0508 #333333 #4c4c4c #670c11 #808080 #999999 #a1121b #b2b2b2 #cccccc #ffffff
+walgreens-theranos-check-in-narrow.png	10	#000000 #202020 #2d0508 #404040 #606060 #808080 #a1121b #bfbfbf #c3676d #ffffff
+walgreens-theranos-check-in-wide.png	10	#000000 #202020 #2d0508 #404040 #606060 #808080 #a1121b #bfbfbf #c3676d #ffffff
